@@ -1,0 +1,10 @@
+Formulario de registro automatico do Django
+https://www.pythontutorial.net/django-tutorial/django-registration/
+
+Criptografia para os dados do Cartão
+https://pypi.org/project/django-cryptography/
+
+Requisitos para implementação inicial:
+- Modelo de Usuario e RFID finais
+- MQTT da porta
+- Cadastro de Usuarios Simples
