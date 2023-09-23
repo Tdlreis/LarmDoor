@@ -8,3 +8,6 @@ Requisitos para implementação inicial:
 - Modelo de Usuario e RFID finais
 - MQTT da porta
 - Cadastro de Usuarios Simples
+
+
+Matricula de professor é ciap

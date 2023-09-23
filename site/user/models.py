@@ -2,11 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class User(AbstractUser):
-    username = models.CharField('Usuário', unique=True, max_length=100)
-    email = models.EmailField('E-mail', unique=True)
+    # username = models.CharField('Usuário', unique=True, max_length=100)
+    # email = models.EmailField('E-mail', unique=True)
     authorization = models.BooleanField('Autorização', default=False)
     user_type = models.PositiveSmallIntegerField()
-
     created_by = models.CharField(max_length=100)
 
     def __str__(self):
