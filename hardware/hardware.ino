@@ -1,6 +1,6 @@
 //Includes
 //Include WiFi
-#include <WiFi.h>
+#include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 //Include LCD_I2C
 #include <Wire.h>
@@ -12,8 +12,9 @@
 
 //Global Variables
 //Config RfID ports
-#define SS_PIN 17
 #define RST_PIN 5
+#define SS_PIN0 17
+#define SS_PIN1 16
 
 //Config Button and Locker ports
 #define locker 2
@@ -31,14 +32,14 @@ const char* MQTTUSERNAME = "esp32";
 const char* MQTTPWD = "n9tt-9g0a-b7fq-ranc";
 
 //RFID
-MFRC522 rfid(SS_PIN, RST_PIN); 
-MFRC522::MIFARE_Key key;
+// MFRC522 rfid(SS_PIN, RST_PIN);
+MFRC522 rfid[2] = {MFRC522(SS_PIN0, RST_PIN), MFRC522(SS_PIN1, RST_PIN)};
+
 
 //LCD
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 //Timer
-hw_timer_t* refreshTimer = NULL;
 bool RLCD = false;
 bool online = false;
 
@@ -117,8 +118,8 @@ void notOpenDoor(bool auth){
 		lcd.print("Nao cadastrado");
 	}
 
-	timerRestart(refreshTimer);
-    timerStart(refreshTimer);
+	// timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
+	timer1_write(5000000);
 }
 
 //MQTT
@@ -201,7 +202,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 //LCD reset
 void IRAM_ATTR lcdResetInter(){
     RLCD = true;
-    timerStop(refreshTimer);
+	// timer1_disable();
 }
 
 void resetLCD(){
@@ -226,12 +227,10 @@ void setup(){
 	SPI.begin(); // Init SPI bus
     rfid.PCD_Init(); // Init MFRC522
 
-	refreshTimer = timerBegin(0, 80, true);                		// timer 0, MWDT clock period = 12.5 ns * TIMGn_Tx_WDT_CLK_PRESCALE -> 12.5 ns * 80 -> 1000 ns = 1 us, countUp
-    timerAttachInterrupt(refreshTimer, &lcdResetInter, true);   		// edge (not level) triggered 
-    timerAlarmWrite(refreshTimer, 5000000, true);          	// 1000000 * 1 us = 1 s, autoreload true
-    timerAlarmEnable(refreshTimer);                        		// enable
-    timerStop(refreshTimer);
-
+	timer1_attachInterrupt(lcdResetInter);
+	timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
+	timer1_write(5000000);
+	timer1_disable();
 	
 	lcd.clear();
     lcd.setCursor(2,0);
@@ -252,17 +251,30 @@ void loop(){
 	// Processa as mensagens MQTT recebidas
 	mqttClient.loop();
 
-	if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()){
+	if (rfid[0].PICC_IsNewCardPresent() && rfid[0].PICC_ReadCardSerial()){
         String cardUID;
-        for (size_t i = 0; i < rfid.uid.size; i++)
+        for (size_t i = 0; i < rfid[0].uid.size; i++)
         {
-            cardUID.concat(String(rfid.uid.uidByte[i] < 0x10 ? "0" : ""));
-            cardUID.concat(String(rfid.uid.uidByte[i], HEX));
+            cardUID.concat(String(rfid[0].uid.uidByte[i] < 0x10 ? "0" : ""));
+            cardUID.concat(String(rfid[0].uid.uidByte[i], HEX));
         }
+        rfid[0].PICC_HaltA();
 		Serial.println(cardUID);
-		mqttClient.publish("server/auth", cardUID.c_str());
-        rfid.PICC_HaltA();
+		String message = "{\"side\":\"1\",\"cardUID\":\"" + cardUID + "\"}";
+		mqttClient.publish("server/auth", message.c_str());
     }
+	else if (rfid[1].PICC_IsNewCardPresent() && rfid[1].PICC_ReadCardSerial()){
+		String cardUID;
+		for (size_t i = 0; i < rfid[1].uid.size; i++)
+		{
+			cardUID.concat(String(rfid[1].uid.uidByte[i] < 0x10 ? "0" : ""));
+			cardUID.concat(String(rfid[1].uid.uidByte[i], HEX));
+		}
+        rfid[1].PICC_HaltA();
+		Serial.println(cardUID);
+		String message = "{\"side\":\"1\",\"cardUID\":\"" + cardUID + "\"}";
+		mqttClient.publish("server/auth", message.c_str());
+	}
 	if(RLCD == true){
       resetLCD();
       RLCD = false;
