@@ -121,3 +121,5 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'user.User'
+
+SECRET_KEY = b'ComMmOzeo3K1BG1CxiZ6l8PkYecQzWjwjYukFGHwmZ0='
