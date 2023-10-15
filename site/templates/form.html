@@ -35,6 +35,7 @@
 
     .form-group input[type="text"],
     .form-group input[type="email"],
+    .form-group input[type="password"],
     .form-group select {
         border: none;
         border-radius: 5px;
@@ -138,6 +139,17 @@
         border-radius: 10%;
     }
 
+    h3 {
+        margin: 20px;
+    }
+
+    #rfid-form-list {
+        background-color: #eef1f3;
+        padding: 20px;
+        border-radius: 40px;
+        margin-bottom: 20px;
+    }
+
 </style>
 <body>
     <p> {{ message }} </p>
@@ -147,127 +159,110 @@
                 <h1 class="form-title">Cadastro</h1>
                 <form name="form" id="form" action="." method="POST">
                     {% csrf_token %}
-                    <div class="form-group">
-                        {% if username != None %}
-                            <p> {{ username.0 }} </p>
-                        {% endif %}
-                        <label for="username">Nome:</label>
-                        {{form.username}}
+                    {% for fm in introform %}
+                    <div class= "form-group">
+                        <p>
+                            {{fm.errors}}
+                        </p>
+                        <label>
+                            {{fm.label}}
+                        </label>
+                        <p>
+                            {{fm}}
+                        </p>
                     </div>
-                    <div class="form-group">
-                        {% if email != None %}
-                            <p> {{ email.0 }} </p>
-                        {% endif %}
-                        <label for="email">E-Mail:</label>                        
-                        {{form.email}}
-                    </div>
-                    <div class="form-group">
-                        {% if password != None %}
-                            <p> {{ password.0 }} </p>
-                        {% endif %}
-                        <label for="password">Password:</label>                        
-                        {{form.password}}
-                    </div>
-                    <div class="form-group">
-                        {% if user_type != None %}
-                            <p> {{ user_type.0 }} </p>
-                        {% endif %}
-                        <label for="user_type">Tipo de Usuário:</label>      
-                        {{form.user_type}}
-                    </div>
-                    <div id='student-form' class="hidden"></div>
-                    {% if formset %}
-                    <h3>Rfid</h3>
-                    {{ formset.management_form }}
-                    <div id='rfid-form-list'>
-                        {% for form in formset %}
-                        <div class="rfid-form">
-                            {{ form.as_table }}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div id='empty-form' class='hidden'>{{formset.empty_form}}</div>
-                    <button class="btn btn-terciary" id='add-more' type='button'>Adicionar Cartão</button>
-                    {% endif %}                    
-                    <div class="form-group autorizacao-container">
-                        <label for="authorization">Autorização:</label>
-                        {{form.authorization}}
-                    </div>
-                    <div class="text-center">
-                        <button  class="btn btn-primary" type='submit' >Save</button>
-                        <a href="/" class="btn btn-secondary ml-2">Voltar</a>
-                    </div>
+                    {% endfor %}
+                    <div id="dinamicArea" class="hidden"></div>
+
+					<div id="rfid-form">
+						<h3>Rfid</h3>
+						{{ rfidFormset.management_form}}
+
+						<div id='rfid-form-list'> 
+							{% for fm in rfidFormset %} 
+							<div class="rfid-form"> 
+								{{ fm.as_table}} 
+							</div> 
+							{% endfor %} 
+							<button class="btn btn-terciary" id='add-more' type='button'>Adicionar Cartão</button>
+						</div>
+						
+					</div>
+					
+					<!-- Action Buttons -->
+					<div class="text-center">
+						<button  class="btn btn-primary" type='submit' >Save</button>
+						<a href="/" class="btn btn-secondary ml-2">Voltar</a>
+					</div>
                 </form>
             </div>
         </div>
     </div>
 
     <script>
-        const addMoreBtn = document.getElementById('add-more')
-        const totalNewForms = document.getElementById('id_form-TOTAL_FORMS')
-        
-        addMoreBtn.addEventListener('click', add_new_form)
-
-        function add_new_form(event) {
-            if (event) {
-                event.preventDefault()
-            }
-            var currentRfidForms = document.getElementsByClassName('rfid-form')
-            var currentFormCount = currentRfidForms.length
-
-            const formCopyTarget = document.getElementById('rfid-form-list')
-            const copyEmptyFormEl = document.getElementById('empty-form').cloneNode(true)
-            const lastAddedForm = currentRfidForms[currentFormCount - 1]
-            const inputs = lastAddedForm.getElementsByTagName('input')
-
-            if (inputs[0].value.trim() == '') {
-                lastAddedForm.remove()                
-                currentRfidForms = document.getElementsByClassName('rfid-form')
-                currentFormCount = currentRfidForms.length
-            }
-
-            copyEmptyFormEl.setAttribute('class', 'rfid-form')
-            copyEmptyFormEl.setAttribute('id', `form-${currentFormCount}`)
-            const regex = new RegExp('__prefix__', 'g')
-            copyEmptyFormEl.innerHTML = copyEmptyFormEl.innerHTML.replace(regex, currentFormCount)
-            totalNewForms.setAttribute('value', currentFormCount + 1)
-
-            fetch('/fetchrfid/')
-            .then(response => {
-                if (response.ok) {
-                    return response.json()
-                } else {
-                // Request failed
-                console.error('Request failed.')
-                }
-            }).then(data =>{
-                const inputField = copyEmptyFormEl.querySelector('input')
-                inputField.value = data.rfid
-            }).catch(error => {
-                // An error occurred during the request
-                console.error('An error occurred:', error)
-            })
-
-            
-            formCopyTarget.append(copyEmptyFormEl) 
-        }
-
         $(document).ready(function(){
-            var selected_option = $('#id_user_type').val();
-            if (selected_option == 1) {
-                $('#student-form').removeClass("hidden");
-                $('#student-form').append("{% for fm in strudentForm %}<div class= \"form-group\"><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
+            // Functions to change Types and forms dinamically
+            function addUserForm(){
+                $('#dinamicArea').append("{% for fm in userForm %}<div class= \"form-group user{{forloop.counter0}}\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
             }
-
-            $('#id_user_type').change(function(){
+            function addStudentForm(){
+                $('#dinamicArea').append("{% for fm in studentForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
+            }
+            function addUserDoorForm(){
+                $('#dinamicArea').append("{% for fm in userDoorForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
+            }
+            function addRfidForm(){
+                $('#dinamicArea').append("<h3>Rfid</h3>{{ rfidFormset.management_form | escapejs }}<div id=\'rfid-form-list\'> {% for fm in rfidFormset %} <div class=\"rfid-form\"> {{ fm.as_table | escapejs}} </div> {% endfor %} <button class=\"btn btn-terciary\" id=\'add-more\' type='button'>Adicionar Cartão</button></div>");
+            }
+            function dinamicChoice(){
                 selected_option = $('#id_user_type').val();
                 if (selected_option == 1) {
-                    $('#student-form').removeClass("hidden");
-                    $('#student-form').append("{% for fm in strudentForm %}<div class= \"form-group\"><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
-                } else {
-                    $('#student-form').addClass("hidden");
-                    $('#student-form').empty();
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");                    
+                    addUserForm();
+                    addStudentForm();
+                    addUserDoorForm();
+                    addRfidForm();
+                } 
+                else if (selected_option == 2) {
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");
+                    addUserForm();
+                    $('#dinamicArea').append("<div class= \"form-group\"><p>{{userDoorForm.nickname.errors.0 | escapejs}}</p><label>{{userDoorForm.nickname.label}}</label><p>{{userDoorForm.nickname | escapejs}}</p></div>");
+                    addRfidForm();
                 }
+                else if (selected_option == 3) {
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");
+                    addUserDoorForm();
+                    addRfidForm();
+                }
+                else if (selected_option == 4){
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");
+                    addUserForm();
+                    $('.user3').addClass("hidden");
+                    $('.user3 input[type="checkbox"]').prop('checked', true);
+                }
+                else {
+                    $('#dinamicArea').addClass("hidden");
+                    $('#dinamicArea').empty();
+                }
+            }
+
+            dinamicChoice();
+
+            $('#id_user_type').change(function(){
+                dinamicChoice();
+            });
+
+            // Add more RFID regions
+
+            // $('#dinamicArea').on('click', '#add-more', function(){
+            $('#add-more').click(function(){
+                //add empty rfid form
+                $('.rfid-form').append("<div class=\"rfid-form\"> {{ rfidFormset.empty_form.as_table | escapejs}} </div>");
+                
             });
         })
     </script>

@@ -4,14 +4,31 @@ from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from cryptography.fernet import Fernet
 
+class UserDoor(models.Model):
+    full_name = models.CharField('Nome Completo', max_length=100, unique=True)
+    nickname = models.CharField('Apelido', max_length=12, blank=True, null=True)
+    expiration_date = models.DateField(blank=True, null=True)
 
 class User(AbstractUser):
-    username = models.CharField('Usuário', unique=True, max_length=100)
+    full_name = models.CharField('Nome Completo', max_length=100, unique=True)
     email = models.EmailField('E-mail', unique=True)
-    authorization = models.BooleanField('Autorização', default=False)
     user_type = models.PositiveSmallIntegerField()
-    created_by = models.CharField(max_length=100)
+    is_admin = models.BooleanField('Administrador', default=False)
+    is_analist = models.BooleanField('Analista', default=False)
 
+    authorization = models.BooleanField('Autorização', default=False)
+    created_by = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    doorUser = models.ForeignKey(UserDoor, on_delete=models.CASCADE, blank=True, null=True)
+
+
+    username = None
+    first_name = None
+    last_name = None
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['full_name', 'user_type']
     def save(self, *args, **kwargs):
         if not self.pk:
             self.password = make_password(self.password)
@@ -19,23 +36,19 @@ class User(AbstractUser):
 
 
     def __str__(self):
-        return self.username
+        return self.full_name   
     
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     user_course = models.CharField('Curso', max_length=100)
     institution_code = models.IntegerField('Matrícula', unique=True)
 
-    user_coordinator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='coordinator', limit_choices_to={'user_type': 3})
+    user_coordinator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='coordinator', limit_choices_to={'user_type': 2})
     user_project = models.CharField('Projeto', max_length=100)
-  
-class Uuid(models.CharField):
-    def get_prep_value(self, value):
-        return str(value).lower()
-    
+
 class Rfid(models.Model):
     rfid_uid = models.CharField(max_length=8, unique=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserDoor, on_delete=models.CASCADE)
     authorization = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
