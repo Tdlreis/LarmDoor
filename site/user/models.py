@@ -8,6 +8,8 @@ class UserDoor(models.Model):
     full_name = models.CharField('Nome Completo', max_length=100, unique=True)
     nickname = models.CharField('Apelido', max_length=12, blank=True, null=True)
     expiration_date = models.DateField(blank=True, null=True)
+    created_by = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class User(AbstractUser):
     full_name = models.CharField('Nome Completo', max_length=100, unique=True)
@@ -17,6 +19,7 @@ class User(AbstractUser):
     is_analist = models.BooleanField('Analista', default=False)
 
     authorization = models.BooleanField('Autorização', default=False)
+
     created_by = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -46,13 +49,15 @@ class Student(models.Model):
     user_coordinator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='coordinator', limit_choices_to={'user_type': 2})
     user_project = models.CharField('Projeto', max_length=100)
 
+    class Meta:
+        verbose_name = "Aluno"
+
 class Rfid(models.Model):
     rfid_uid = models.CharField(max_length=8, unique=True)
     user = models.ForeignKey(UserDoor, on_delete=models.CASCADE)
     authorization = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        self.rfid_uid = self.rfid_uid.upper()
         fernet = Fernet(settings.SECRET_KEY);
         self.rfid_uid = fernet.encrypt(self.rfid_uid.encode())
         super(Rfid, self).save(*args, **kwargs)

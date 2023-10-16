@@ -16,7 +16,7 @@ class IntroForm(forms.Form):
 
 
 class UserDoorForm(forms.ModelForm):
-    nickname = forms.CharField(label="Apelido", max_length=12, required=True, validators=[RegexValidator(r'^[0-9a-zA-Z]*$', 'Apenas letras e números são permitidos')])
+    nickname = forms.CharField(label="Apelido", max_length=12, required=True, validators=[RegexValidator(r'^[0-9a-zA-Z ]*$', 'Apenas letras e números são permitidos')])
     expiration_date = forms.DateField(label="Data de Expiração", widget=forms.DateInput(attrs={'type': 'date'}))
 
 
@@ -49,9 +49,12 @@ class StudentForm(forms.ModelForm):
         self.fields['user_project'].label = "Projeto:"
 
 class RfidForm(forms.ModelForm):
-    rfid_uid = forms.CharField(label="")
+    rfid_uid = forms.CharField(label="",  max_length=8)
     authorization = forms.BooleanField(label="", required=False, initial=True)
-
     class Meta:
         model = Rfid
         fields = ["rfid_uid", "authorization"]
+
+    def clean_rfid_uid(self):
+        upper = self.cleaned_data['rfid_uid']
+        return upper.upper()

@@ -48,13 +48,13 @@ def create(request):
                         if form.has_changed():
                             rfid = form.save(commit=False)
                             rfid.user = userDoor
-                            rfid.rfid_uid = rfid.rfid_uid.upper()
                             rfid.save()
                     
                     return redirect(reverse('index'))
             elif user_type == "2":
                 userDoorForm.fields['expiration_date'].required = False
-                if userForm.is_valid() and userDoorForm.is_valid() and rfidFormset.is_valid():                    
+                if userForm.is_valid() and userDoorForm.is_valid() and rfidFormset.is_valid():    
+                    print("entrou")                
                     userDoor = userDoorForm.save(commit=False)
                     userDoor.full_name = full_name
                     userDoor.save()
@@ -69,7 +69,6 @@ def create(request):
                         if form.has_changed():
                             rfid = form.save(commit=False)
                             rfid.user = userDoor
-                            rfid.rfid_uid = rfid.rfid_uid.upper()
                             rfid.save()
                     
                     return redirect(reverse('index'))
@@ -84,7 +83,6 @@ def create(request):
                         if form.has_changed():
                             rfid = form.save(commit=False)
                             rfid.user = userDoor
-                            rfid.rfid_uid = rfid.rfid_uid.upper()
                             rfid.save()
 
                     return redirect(reverse('index'))
