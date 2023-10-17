@@ -58,7 +58,7 @@ class Rfid(models.Model):
     authorization = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
-        fernet = Fernet(settings.SECRET_KEY);
+        fernet = Fernet(settings.SECRET_KEY1);
         self.rfid_uid = fernet.encrypt(self.rfid_uid.encode())
         super(Rfid, self).save(*args, **kwargs)
 
