@@ -244,9 +244,6 @@
             // Add more RFID regions
 
             $('#dinamicArea').on('click', '#add-more', function(){
-
-
-
                 if ($('.rfid-form').last().find('input').first().val().trim() != '') {
 					$('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) + 1);
 					$('#rfid-form-list').append("<div id=\"form-" + (parseInt($('#id_form-TOTAL_FORMS').val())-1) + "\"class=\"rfid-form\">{{ rfidFormset.empty_form.as_table | escapejs}}</div>");

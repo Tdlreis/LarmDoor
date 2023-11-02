@@ -1,13 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.forms.models import modelformset_factory
-from user.forms import UserForm, StudentForm, RfidForm, IntroForm, UserDoorForm
+from userform.forms import UserForm, StudentForm, RfidForm, IntroForm, UserDoorForm
 from .models import User, Rfid
 from django.http import JsonResponse
-
-# Create your views here.
-def index(request):
-    return render(request, 'index.html')
 
 def create(request):
     introform = IntroForm(request.POST or None)
