@@ -46,7 +46,7 @@ def create(request):
                             rfid.user = userDoor
                             rfid.save()
                     
-                    return redirect(reverse('index'))
+                    return redirect(reverse('table'))
             elif user_type == "2":
                 userDoorForm.fields['expiration_date'].required = False
                 if userForm.is_valid() and userDoorForm.is_valid() and rfidFormset.is_valid():    
@@ -67,11 +67,12 @@ def create(request):
                             rfid.user = userDoor
                             rfid.save()
                     
-                    return redirect(reverse('index'))
+                    return redirect(reverse('table'))
             elif user_type == "3":
                 if userDoorForm.is_valid() and rfidFormset.is_valid():
                     userDoor = userDoorForm.save(commit=False)
                     userDoor.full_name = full_name
+                    userDoor.isUser = False
                     userDoor.save()
 
 
@@ -81,7 +82,7 @@ def create(request):
                             rfid.user = userDoor
                             rfid.save()
 
-                    return redirect(reverse('index'))
+                    return redirect(reverse('table'))
             elif user_type == "4":
                 if userForm.is_valid():
                     user = userForm.save(commit=False)
@@ -89,7 +90,7 @@ def create(request):
                     user.user_type = user_type
                     user.save()
 
-                    return redirect(reverse('index'))
+                    return redirect(reverse('table'))
 
     context = {
         "introform": introform,

@@ -8,6 +8,7 @@ class UserDoor(models.Model):
     full_name = models.CharField('Nome Completo', max_length=100, unique=True)
     nickname = models.CharField('Apelido', max_length=12, blank=True, null=True)
     expiration_date = models.DateField(blank=True, null=True)
+    isUser = models.BooleanField(default=True)
     created_by = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
