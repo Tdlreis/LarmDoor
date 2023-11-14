@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+{% block content %}
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<link href="https://getbootstrap.com/docs/4.0/examples/sign-in/signin.css" rel="stylesheet">
+<style>
+    .hidden
+    {
+        display: none;
+    }
+
+    select option:selected {
+        display: none;
+      }
+
+    body {
+        background-color: #f8f9fa;
+        height: auto;
+    }
+
+    .form-container {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-title {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"],
+    .form-group select {
+        border: none;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        padding: 10px;
+        width: 100%;
+        margin-top: 5px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        color: #333;
+        transition: background-color 0.3s ease;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group select:focus {
+        outline: none;
+        background-color: #e2e6ea;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+        font-size: 16px;
+    }
+
+    .btn-primary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        font-size: 16px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    .form-group.autorizacao-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .form-group.autorizacao-container label {
+        margin: 0;
+        margin-right: 10px;
+    }
+
+    .form-group.ano-container {
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .rfid-form {
+        padding: 0.5vh;
+        width: 100%;
+    }
+
+    .rfid-form input[type="text"],
+    .rfid-form select {
+        border: none;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        padding: 10px;
+        width: 90%;
+        margin-top: 5px;
+        margin-bottom: 20px;
+        margin-right: 20px;
+        font-size: 16px;
+        color: #333;
+        transition: background-color 0.3s ease;
+    }
+
+    .rfid-form input[type="text"]:focus,
+    .rfid-form select:focus {
+        outline: none;
+        background-color: #e2e6ea;
+    }
+
+    .btn-terciary {
+        width: 100%;
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .btn-terciary:hover {
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+
+    #student-form {
+        background-color: #eef1f3;
+        padding: 20px;
+        border-radius: 10%;
+    }
+
+    h3 {
+        margin: 20px;
+    }
+
+    #rfid-form-list {
+        background-color: #eef1f3;
+        padding: 20px;
+        border-radius: 40px;
+        margin-bottom: 20px;
+    }
+
+</style>
+<body>
+    <p> {{ message }} </p>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 form-container">
+                <h1 class="form-title">Cadastro</h1>
+                <form name="form" id="form" action="." method="POST">
+                    {% csrf_token %}
+
+                    {% if userForm %}
+                    {% for fm in userForm %}
+                    <div class= "form-group">
+                        <p>{{fm.errors}}</p>
+                        <label>{{fm.label}}</label>
+                        <p>{{fm}}</p>
+                    </div>
+                    {% endfor %}
+                    {% endif %}	
+
+                    {% if studentForm %}
+                    {% for fm in studentForm %}
+                    <div class= "form-group">
+                        <p>{{fm.errors}}</p>
+                        <label>{{fm.label}}</label>
+                        <p>{{fm}}</p>
+                    </div>
+                    {% endfor %}
+                    {% endif %}	
+
+
+                    {% if userDoorForm %}
+                    {% for fm in userDoorForm %}
+                    <div class= "form-group">
+                        <p>{{fm.errors}}</p>
+                        <label>{{fm.label}}</label>
+                        <p>{{fm}}</p>
+                    </div>
+                    {% endfor %}
+                    {% endif %}		
+                    
+                    {% if rfidFormset %}
+                    <h3>Rfid</h3>
+                    {{ rfidFormset.management_form }}
+                    <div id='rfid-form-list'>
+                        {% for form in rfidFormset %}
+                        <div class="rfid-form">
+                            {{ form.as_table }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div id='empty-form' class='hidden'>{{rfidFormset.empty_form}}</div>
+                    <button class="btn btn-terciary" id='add-more' type='button'>Adicionar Cartão</button>
+                    {% endif %}
+					
+					<!-- Action Buttons -->
+					<div class="text-center">
+						<button  class="btn btn-primary" type='submit' >Save</button>
+						<a href="/" class="btn btn-secondary ml-2">Voltar</a>
+					</div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            // Functions to change Types and forms dinamically
+            function addUserForm(){
+                $('#dinamicArea').append("{% for fm in userForm %}<div class= \"form-group user{{forloop.counter0}}\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
+            }
+            function addStudentForm(){
+                $('#dinamicArea').append("{% for fm in studentForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
+            }
+            function addUserDoorForm(){
+                $('#dinamicArea').append("{% for fm in userDoorForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
+            }
+            function addRfidForm(){
+                $('#dinamicArea').append("<div id=\"rfid-form\"> <h3>Rfid</h3> {{ rfidFormset.management_form | escapejs }} <div id='rfid-form-list'> {% for fm in rfidFormset %} <div class=\"rfid-form\"> {{ fm.as_table | escapejs }} </div> {% endfor %} </div> <button class=\"btn btn-terciary\" id='add-more' type='button'>Adicionar Cartão</button> </div>");
+            }
+            function dinamicChoice(){
+                selected_option = $('#id_user_type').val();
+                if (selected_option == 1) {
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");                    
+                    addUserForm();
+                    addStudentForm();
+                    addUserDoorForm();
+                    addRfidForm();
+                } 
+                else if (selected_option == 2) {
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");
+                    addUserForm();
+                    $('#dinamicArea').append("<div class= \"form-group\"><p>{{userDoorForm.nickname.errors.0 | escapejs}}</p><label>{{userDoorForm.nickname.label}}</label><p>{{userDoorForm.nickname | escapejs}}</p></div>");
+                    addRfidForm();
+                }
+                else if (selected_option == 3) {
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");
+                    addUserDoorForm();
+                    addRfidForm();
+                }
+                else if (selected_option == 4){
+                    $('#dinamicArea').empty();
+                    $('#dinamicArea').removeClass("hidden");
+                    addUserForm();
+                    $('.user3').addClass("hidden");
+                    $('.user3 input[type="checkbox"]').prop('checked', true);
+                }
+                else {
+                    $('#dinamicArea').addClass("hidden");
+                    $('#dinamicArea').empty();
+                }
+            }
+
+            dinamicChoice();
+
+            $('#id_user_type').change(function(){
+                dinamicChoice();
+            });
+
+            // Add more RFID regions
+
+            $('#dinamicArea').on('click', '#add-more', function(){
+                if ($('.rfid-form').last().find('input').first().val().trim() != '') {
+					$('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) + 1);
+					$('#rfid-form-list').append("<div id=\"form-" + (parseInt($('#id_form-TOTAL_FORMS').val())-1) + "\"class=\"rfid-form\">{{ rfidFormset.empty_form.as_table | escapejs}}</div>");
+					$('.rfid-form').last().html($('.rfid-form').last().html().replace(/__prefix__/g, (parseInt($('#id_form-TOTAL_FORMS').val())-1)));
+				}
+            });
+        })
+    </script>
+</body>
+{% endblock %}
