@@ -60,7 +60,7 @@ class Rfid(models.Model):
 
     def save(self, *args, **kwargs):
         fernet = Fernet(settings.SECRET_KEY1);
-        self.rfid_uid = fernet.encrypt(self.rfid_uid.encode())
+        self.rfid_uid = fernet.encrypt(self.rfid_uid.encode()).decode()
         super(Rfid, self).save(*args, **kwargs)
 
 class PunchCard(models.Model):

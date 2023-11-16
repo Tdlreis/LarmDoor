@@ -38,6 +38,7 @@
     .form-group input[type="text"],
     .form-group input[type="email"],
     .form-group input[type="password"],
+    .form-group input[type="date"],
     .form-group select {
         border: none;
         border-radius: 5px;
@@ -219,64 +220,9 @@
 
     <script>
         $(document).ready(function(){
-            // Functions to change Types and forms dinamically
-            function addUserForm(){
-                $('#dinamicArea').append("{% for fm in userForm %}<div class= \"form-group user{{forloop.counter0}}\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
-            }
-            function addStudentForm(){
-                $('#dinamicArea').append("{% for fm in studentForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
-            }
-            function addUserDoorForm(){
-                $('#dinamicArea').append("{% for fm in userDoorForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
-            }
-            function addRfidForm(){
-                $('#dinamicArea').append("<div id=\"rfid-form\"> <h3>Rfid</h3> {{ rfidFormset.management_form | escapejs }} <div id='rfid-form-list'> {% for fm in rfidFormset %} <div class=\"rfid-form\"> {{ fm.as_table | escapejs }} </div> {% endfor %} </div> <button class=\"btn btn-terciary\" id='add-more' type='button'>Adicionar Cartão</button> </div>");
-            }
-            function dinamicChoice(){
-                selected_option = $('#id_user_type').val();
-                if (selected_option == 1) {
-                    $('#dinamicArea').empty();
-                    $('#dinamicArea').removeClass("hidden");                    
-                    addUserForm();
-                    addStudentForm();
-                    addUserDoorForm();
-                    addRfidForm();
-                } 
-                else if (selected_option == 2) {
-                    $('#dinamicArea').empty();
-                    $('#dinamicArea').removeClass("hidden");
-                    addUserForm();
-                    $('#dinamicArea').append("<div class= \"form-group\"><p>{{userDoorForm.nickname.errors.0 | escapejs}}</p><label>{{userDoorForm.nickname.label}}</label><p>{{userDoorForm.nickname | escapejs}}</p></div>");
-                    addRfidForm();
-                }
-                else if (selected_option == 3) {
-                    $('#dinamicArea').empty();
-                    $('#dinamicArea').removeClass("hidden");
-                    addUserDoorForm();
-                    addRfidForm();
-                }
-                else if (selected_option == 4){
-                    $('#dinamicArea').empty();
-                    $('#dinamicArea').removeClass("hidden");
-                    addUserForm();
-                    $('.user3').addClass("hidden");
-                    $('.user3 input[type="checkbox"]').prop('checked', true);
-                }
-                else {
-                    $('#dinamicArea').addClass("hidden");
-                    $('#dinamicArea').empty();
-                }
-            }
-
-            dinamicChoice();
-
-            $('#id_user_type').change(function(){
-                dinamicChoice();
-            });
-
-            // Add more RFID regions
-
-            $('#dinamicArea').on('click', '#add-more', function(){
+            console.log('ready');
+            $('#add-more').on('click', function(){
+                console.log('add-more');
                 if ($('.rfid-form').last().find('input').first().val().trim() != '') {
 					$('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) + 1);
 					$('#rfid-form-list').append("<div id=\"form-" + (parseInt($('#id_form-TOTAL_FORMS').val())-1) + "\"class=\"rfid-form\">{{ rfidFormset.empty_form.as_table | escapejs}}</div>");
