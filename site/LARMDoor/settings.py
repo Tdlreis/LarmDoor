@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'userform',
     'usertable',
+    'mqtt.apps.MqttConfig',
 ]
 
 MIDDLEWARE = [
@@ -113,7 +114,7 @@ TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
-# USE_L10N = True
+USE_L10N = True
 
 USE_TZ = False
 
@@ -126,3 +127,17 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'userform.User'
 
 SECRET_KEY1 = b'ComMmOzeo3K1BG1CxiZ6l8PkYecQzWjwjYukFGHwmZ0='
+
+# MQTT
+# MQTT_SERVER = '192.168.3.46'
+MQTT_SERVER = '192.168.3.82'
+MQTT_PORT = 1883
+MQTT_KEEPALIVE = 60
+MQTT_USER = 'Server'
+MQTT_PASSWORD = 'yXZp4Kx6s0NpbxI'
+
+# MQTT topics to subscribe to
+MQTT_TOPICS = [
+    "server/auth/#",
+    # Add more topics as needed
+]

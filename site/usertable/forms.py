@@ -4,8 +4,8 @@ from django.core.exceptions import ValidationError
 from userform.models import User, Student, Rfid, UserDoor
 from django.core.validators import RegexValidator
 
-from django.conf import settings
-from cryptography.fernet import Fernet
+# from django.conf import settings
+# from cryptography.fernet import Fernet
 
 class UserDoorFormTemp(forms.ModelForm):
     nickname = forms.CharField(label="Apelido", max_length=12, required=True, validators=[RegexValidator(r'^[0-9a-zA-Z ]*$', 'Apenas letras e números são permitidos')])
@@ -58,13 +58,13 @@ class RfidForm(forms.ModelForm):
         model = Rfid
         fields = ["rfid_uid", "authorization"]
 
-    def __init__(self, *args, **kwargs):
-        super(RfidForm, self).__init__(*args, **kwargs)
-        fernet = Fernet(settings.SECRET_KEY1)
-        rfid_uid = self.initial.get('rfid_uid')
-        if rfid_uid:
-            decrypted_value = fernet.decrypt(rfid_uid.encode()).decode()
-            self.initial['rfid_uid'] = decrypted_value
+    # def __init__(self, *args, **kwargs):
+    #     super(RfidForm, self).__init__(*args, **kwargs)
+    #     fernet = Fernet(settings.SECRET_KEY1)
+    #     rfid_uid = self.initial.get('rfid_uid')
+    #     if rfid_uid:
+    #         decrypted_value = fernet.decrypt(rfid_uid.encode()).decode()
+    #         self.initial['rfid_uid'] = decrypted_value
 
     def clean_rfid_uid(self):
         upper = self.cleaned_data['rfid_uid']

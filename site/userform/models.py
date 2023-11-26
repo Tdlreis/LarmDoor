@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.hashers import make_password
-from django.conf import settings
-from cryptography.fernet import Fernet
+
+# from django.conf import settings
+# from cryptography.fernet import Fernet
 
 class UserDoor(models.Model):
     full_name = models.CharField('Nome Completo', max_length=100, unique=True)
@@ -11,6 +12,8 @@ class UserDoor(models.Model):
     isUser = models.BooleanField(default=True)
     created_by = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
+    authorization = models.BooleanField('Autorização', default=False)
+
 
 class User(AbstractUser):
     full_name = models.CharField('Nome Completo', max_length=100, unique=True)
@@ -58,10 +61,10 @@ class Rfid(models.Model):
     user = models.ForeignKey(UserDoor, on_delete=models.CASCADE)
     authorization = models.BooleanField(default=True)
 
-    def save(self, *args, **kwargs):
-        fernet = Fernet(settings.SECRET_KEY1);
-        self.rfid_uid = fernet.encrypt(self.rfid_uid.encode()).decode()
-        super(Rfid, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     fernet = Fernet(settings.SECRET_KEY1);
+    #     self.rfid_uid = fernet.encrypt(self.rfid_uid.encode()).decode()
+    #     super(Rfid, self).save(*args, **kwargs)
 
 class PunchCard(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
