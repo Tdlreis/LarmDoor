@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.forms.models import modelformset_factory
-from userform.forms import UserForm, StudentForm, RfidForm, IntroForm, UserDoorForm
+from userform.forms import UserForm, StudentForm, RfidForm, UserSystemForm, UserDoorForm
 from .models import User, Rfid
 from django.http import JsonResponse
 
 def create(request):
-    introform = IntroForm(request.POST or None)
     userForm = UserForm(request.POST or None)
+    userSystemForm = UserSystemForm(request.POST or None)
     studentForm = StudentForm(request.POST or None)
     userDoorForm = UserDoorForm(request.POST or None)
 
@@ -19,26 +19,25 @@ def create(request):
 
     
     if request.method == 'POST':
-        if introform.is_valid():
-            full_name = introform.cleaned_data['full_name']
-            user_type = introform.cleaned_data['user_type']            
+        if userForm.is_valid():
+            user_type = userForm.cleaned_data['user_type']            
             
             if user_type == "1":
-                if userForm.is_valid() and studentForm.is_valid() and userDoorForm.is_valid() and rfidFormset.is_valid():
+                if userSystemForm.is_valid() and studentForm.is_valid() and userDoorForm.is_valid() and rfidFormset.is_valid():
+                    user = userForm.save(commit=False)
+                    user.save()
+
                     userDoor = userDoorForm.save(commit=False)
-                    userDoor.full_name = full_name
+                    userDoor.user = user
                     userDoor.save()
 
-                    user = userForm.save(commit=False)
-                    user.full_name = full_name
-                    user.user_type = user_type
-                    user.doorUser = userDoor
-                    user.save()
+                    userSystem = userSystemForm.save(commit=False)
+                    userSystem.user = user
+                    userSystem.save()
 
                     student = studentForm.save(commit=False)
                     student.user = user
                     student.save()
-
 
                     for form in rfidFormset:
                         if form.has_changed():
@@ -50,16 +49,15 @@ def create(request):
             elif user_type == "2":
                 userDoorForm.fields['expiration_date'].required = False
                 if userForm.is_valid() and userDoorForm.is_valid() and rfidFormset.is_valid():    
-                    print("entrou")                
+                    user = userForm.save()
+                    
                     userDoor = userDoorForm.save(commit=False)
-                    userDoor.full_name = full_name
+                    userDoor.user = user
                     userDoor.save()
 
-                    user = userForm.save(commit=False)
-                    user.full_name = full_name
-                    user.user_type = user_type
-                    user.doorUser = userDoor
-                    user.save()
+                    userSystem = userSystemForm.save(commit=False)
+                    userSystem.user = user
+                    userSystem.save()                
 
                     for form in rfidFormset:
                         if form.has_changed():
@@ -70,9 +68,11 @@ def create(request):
                     return redirect(reverse('table'))
             elif user_type == "3":
                 if userDoorForm.is_valid() and rfidFormset.is_valid():
+                    user = userForm.save(commit=False)
+                    user.save()
+
                     userDoor = userDoorForm.save(commit=False)
-                    userDoor.full_name = full_name
-                    userDoor.isUser = False
+                    userDoor.user = user
                     userDoor.save()
 
 
@@ -86,16 +86,18 @@ def create(request):
             elif user_type == "4":
                 if userForm.is_valid():
                     user = userForm.save(commit=False)
-                    user.full_name = full_name
-                    user.user_type = user_type
                     user.save()
+
+                    userSystem = userSystemForm.save(commit=False)
+                    userSystem.user = user
+                    userSystem.save()
 
                     return redirect(reverse('table'))
 
     context = {
-        "introform": introform,
         "userForm": userForm, 
         "studentForm": studentForm,
+        "userSystemForm": userSystemForm,
         "rfidFormset": rfidFormset,
         "userDoorForm": userDoorForm,
     }

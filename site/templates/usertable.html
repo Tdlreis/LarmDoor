@@ -52,7 +52,7 @@
                     {% for professores_data in Professores %}
                     <tr>
                         <td class="align-middle">{{ professores_data.full_name }}</td>
-                        <td class="align-middle">{{ professores_data.email }}</td>
+                        <td class="align-middle">{{ professores_data.usersystem.email }}</td>
                         <!-- <td class="align-middle">{{ professores_data.professores.is_admin }}</td>
                         <td class="align-middle">{{ professores_data.professores.is_analist }}</td>
                         <td class="align-middle">{{ professores_data.professores.authorization }}</td>
@@ -92,10 +92,10 @@
                 <tbody>
                     {% for alunos_data in Alunos %}
                     <tr>
-                        <td class="align-middle">{{ alunos_data.user.full_name }}</td>
-                        <td class="align-middle">{{ alunos_data.user.email }}</td>
+                        <td class="align-middle">{{ alunos_data.full_name }}</td>
+                        <td class="align-middle">{{ alunos_data.usersystem.email }}</td>
                         <!-- <td class="align-middle">{{ alunos_data.user_course }}</td> -->
-                        <td class="align-middle">{{ alunos_data.institution_code }}</td>
+                        <td class="align-middle">{{ alunos_data.student.institution_code }}</td>
                         <!-- <td class="align-middle">{{ alunos_data.user_coordinator }}</td> -->
                         <td>
                             <a href="/hours/{{ alunos_data.user.id }}/2/" class="btn btn-light">
@@ -129,7 +129,7 @@
                     {% for user_data in Visitantes %}
                     <tr>
                         <td class="align-middle">{{ user_data.full_name }}</td>
-                        <td class="align-middle">{{ user_data.expiration_date }}</td>
+                        <td class="align-middle">{{ user_data.userdoor.expiration_date }}</td>
                         <td class="align-middle">
                             <a href="/hours/{{ user_data.id }}/3/" class="btn btn-light">
                                 <span class="bi bi-eye"></span>
@@ -154,7 +154,7 @@
                 <thead class="thead-dark">
                     <tr>
                         <th scope="col">Nome</th>
-                        <th scope="col">Curso</th>
+                        <th scope="col">E-mail</th>
                         <th scope="col">Ações</th>
                     </tr>
                 </thead>
@@ -162,7 +162,7 @@
                     {% for user_data in Observadores %}
                     <tr>
                         <td class="align-middle">{{ user_data.full_name }}</td>
-                        <td class="align-middle">{{ user_data.email }}</td>
+                        <td class="align-middle">{{ user_data.usersystem.email }}</td>
                         <td class="align-middle">
                             <a href="/hours/{{ user_data.id }}/4/" class="btn btn-light">
                                 <span class="bi bi-eye"></span>

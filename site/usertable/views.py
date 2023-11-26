@@ -3,18 +3,18 @@ from django.urls import reverse
 from django.forms import modelformset_factory
 
 
-from userform.models import User, Student, Rfid, UserDoor
+from userform.models import User, Student, Rfid, UserDoor, UserSystem
 from usertable.forms import UserForm, StudentForm, RfidForm, UserDoorFormTemp, UserDoorFormProfessor, UserDoorFormStudent
 
 # Create your views here.
 def table(request):
-    professores = User.objects.filter(user_type=2)
+    professores = User.objects.select_related('usersystem').filter(user_type=2)
 
-    alunos = Student.objects.select_related('user')
+    alunos = User.objects.select_related('usersystem', 'student').filter(user_type=1)
     
-    visitantes = UserDoor.objects.filter(isUser=0)
+    visitantes = User.objects.select_related('userdoor').filter(user_type=3)
 
-    observadores = User.objects.filter(user_type=4)
+    observadores = User.objects.select_related('usersystem').filter(user_type=4)
     
     context = {
         'Professores': professores,
@@ -28,14 +28,10 @@ def table(request):
 def delete(request, pk, model):
     if(model == 1):
         db = User.objects.get(pk=pk)
-        db2 = db.doorUser
         db.delete()
-        db2.delete()
     elif(model == 2):
         db = User.objects.get(pk=pk)
-        db2 = db.doorUser
         db.delete()
-        db2.delete()
     elif(model == 3):
         db = UserDoor.objects.get(pk=pk)
         db.delete() 

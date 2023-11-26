@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'userform',
-    'usertable',
+    'userform.apps.UserformConfig',
+    'usertable.apps.UsertableConfig',
     'mqtt.apps.MqttConfig',
 ]
 
@@ -124,9 +124,11 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
-AUTH_USER_MODEL = 'userform.User'
+AUTH_USER_MODEL = 'userform.UserSystem'
 
 SECRET_KEY1 = b'ComMmOzeo3K1BG1CxiZ6l8PkYecQzWjwjYukFGHwmZ0='
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # MQTT
 # MQTT_SERVER = '192.168.3.46'

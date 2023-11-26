@@ -162,7 +162,7 @@
                 <h1 class="form-title">Cadastro</h1>
                 <form name="form" id="form" action="." method="POST">
                     {% csrf_token %}
-                    {% for fm in introform %}
+                    {% for fm in userForm %}
                     <div class= "form-group">
                         <p>
                             {{fm.errors}}
@@ -190,8 +190,8 @@
     <script>
         $(document).ready(function(){
             // Functions to change Types and forms dinamically
-            function addUserForm(){
-                $('#dinamicArea').append("{% for fm in userForm %}<div class= \"form-group user{{forloop.counter0}}\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
+            function addUserSystemForm(){
+                $('#dinamicArea').append("{% for fm in userSystemForm %}<div class= \"form-group user{{forloop.counter0}}\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
             }
             function addStudentForm(){
                 $('#dinamicArea').append("{% for fm in studentForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
@@ -207,7 +207,7 @@
                 if (selected_option == 1) {
                     $('#dinamicArea').empty();
                     $('#dinamicArea').removeClass("hidden");                    
-                    addUserForm();
+                    addUserSystemForm();
                     addStudentForm();
                     addUserDoorForm();
                     addRfidForm();
@@ -215,7 +215,7 @@
                 else if (selected_option == 2) {
                     $('#dinamicArea').empty();
                     $('#dinamicArea').removeClass("hidden");
-                    addUserForm();
+                    addUserSystemForm();
                     $('#dinamicArea').append("<div class= \"form-group\"><p>{{userDoorForm.nickname.errors.0 | escapejs}}</p><label>{{userDoorForm.nickname.label}}</label><p>{{userDoorForm.nickname | escapejs}}</p></div>");
                     addRfidForm();
                 }
@@ -228,7 +228,7 @@
                 else if (selected_option == 4){
                     $('#dinamicArea').empty();
                     $('#dinamicArea').removeClass("hidden");
-                    addUserForm();
+                    addUserSystemForm();
                     $('.user3').addClass("hidden");
                     $('.user3 input[type="checkbox"]').prop('checked', true);
                 }
