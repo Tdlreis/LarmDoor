@@ -9,17 +9,14 @@ from django.core.validators import RegexValidator
 
 class UserForm(forms.ModelForm):
     full_name = forms.CharField(label="Nome Completo", max_length=100)
-    user_type = forms.ChoiceField(label="Tipo de Usuário",choices=[('','Selecione uma opção'), (1,'Aluno'), (2,"Professor"), (3, "Visitante"), (4, "Observador")], widget=forms.Select(attrs={'id': 'id_user_type'}))
     authorization = forms.BooleanField(required=False, initial=True)
 
     class Meta:
         model = User
-        fields = ['full_name', 'user_type', 'authorization']
+        fields = ['full_name', 'authorization']
         exclude = ['user_type']
 
-
-
-class UserDoorFormTemp(forms.ModelForm):
+class UserDoorForm(forms.ModelForm):
     nickname = forms.CharField(label="Apelido", max_length=12, required=True, validators=[RegexValidator(r'^[0-9a-zA-Z ]*$', 'Apenas letras e números são permitidos')])
     expiration_date = forms.DateField(label="Data de Expiração", localize=True, widget=forms.DateInput(format = '%Y-%m-%d',attrs={'type': 'date'}),)
     class Meta:
@@ -32,15 +29,8 @@ class UserDoorFormProfessor(forms.ModelForm):
         model = UserDoor
         fields = ['nickname', 'expiration_date']
         exclude = ['expiration_date']
-    
-class UserDoorFormStudent(forms.ModelForm):
-    nickname = forms.CharField(label="Apelido", max_length=12, required=True, validators=[RegexValidator(r'^[0-9a-zA-Z ]*$', 'Apenas letras e números são permitidos')])
-    class Meta:
-        model = UserDoor
-        fields = ['nickname', 'expiration_date']
 
 class UserSystemForm(forms.ModelForm):
-    authorization = forms.BooleanField(required=False, initial=True)
     email = forms.EmailField()
 
     class Meta:
