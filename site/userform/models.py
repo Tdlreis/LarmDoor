@@ -45,8 +45,8 @@ class UserSystem(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.password = make_password(self.password)
+        print("Chamou")
+        self.password = make_password(self.password)
         super(UserSystem, self).save(*args, **kwargs)
 
     class Meta:
@@ -77,8 +77,8 @@ class Rfid(models.Model):
     #     super(Rfid, self).save(*args, **kwargs)
 
 class PunchCard(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    punch_in_time = models.DateTimeField()    
+    user = models.ForeignKey(UserDoor, on_delete=models.CASCADE)
+    punch_in_time = models.DateTimeField(null=True, blank=True)    
     punch_out_time = models.DateTimeField(null=True, blank=True)
     reviw =  models.BooleanField(default=False)
     out  = models.BooleanField(default=True)

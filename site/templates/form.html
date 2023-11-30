@@ -200,8 +200,9 @@
                 $('#dinamicArea').append("{% for fm in userDoorForm %}<div class= \"form-group\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
             }
             function addRfidForm(){
-                $('#dinamicArea').append("<div id=\"rfid-form\"> <h3>Rfid</h3> {{ rfidFormset.management_form | escapejs }} <div id='rfid-form-list'> {% for fm in rfidFormset %} <div class=\"rfid-form\"> {{ fm.as_table | escapejs }} </div> {% endfor %} </div> <button class=\"btn btn-terciary\" id='add-more' type='button'>Adicionar Cartão</button> </div>");
+                $('#dinamicArea').append("<div id=\"rfid-form\"> <h3>Rfid</h3> {{ rfidFormset.management_form | escapejs }} <div id='rfid-form-list'> {% for fm in rfidFormset %} <div class=\"rfid-form\"> {{ fm.as_table | escapejs }} </div> {% endfor %} </div> <div class=\"row justify-content-center\"> <div class=\"col-auto\"> <button class=\"btn btn-terciary\" id='add-more' type='button'>Adicionar Cartão</button> </div> <div class=\"col-1\"></div> <div class=\"col-auto\"> <button class=\"btn btn-terciary\" id='read-rfid' type='button'>Ler Ultimo Cartão</button> </div> </div> </div>");
             }
+            
             function dinamicChoice(){
                 selected_option = $('#id_user_type').val();
                 if (selected_option == 1) {
@@ -237,21 +238,38 @@
                     $('#dinamicArea').empty();
                 }
             }
-
             dinamicChoice();
-
             $('#id_user_type').change(function(){
                 dinamicChoice();
             });
 
-            // Add more RFID regions
-
-            $('#dinamicArea').on('click', '#add-more', function(){
+            function addRFIDField(){
                 if ($('.rfid-form').last().find('input').first().val().trim() != '') {
 					$('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) + 1);
 					$('#rfid-form-list').append("<div id=\"form-" + (parseInt($('#id_form-TOTAL_FORMS').val())-1) + "\"class=\"rfid-form\">{{ rfidFormset.empty_form.as_table | escapejs}}</div>");
 					$('.rfid-form').last().html($('.rfid-form').last().html().replace(/__prefix__/g, (parseInt($('#id_form-TOTAL_FORMS').val())-1)));
 				}
+            }
+
+            // Add more RFID regions
+            $('#dinamicArea').on('click', '#add-more', function(){
+                addRFIDField();                
+            });
+        
+            $('#dinamicArea').on('click', '#read-rfid', function(){
+                console.log("read-rfid");
+                $.ajax({
+                    url: '/fetchrfid/',
+                    type: 'GET',
+                    success: function(response) {
+                        var data =  response.rfid;
+                        console.log(data);
+                        if ($('.rfid-form').last().find('input').first().val().trim() != '') {
+                            addRFIDField();
+                        }
+                        $('.rfid-form').last().find('input').first().val(data);
+                    }
+                });
             });
         })
     </script>

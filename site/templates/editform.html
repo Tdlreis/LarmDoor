@@ -215,6 +215,17 @@
                         {% endfor %}
                     </div>
                     <div id='empty-form' class='hidden'>{{rfidFormset.empty_form}}</div>
+                    <div class="row justify-content-center">
+                        <div class="col-auto"> 
+                            <button class="btn btn-terciary" id='add-more' type='button'>Adicionar Cartão</button>
+                        </div> 
+                        <div class="col-1">
+
+                        </div> 
+                        <div class="col-auto"> 
+                            <button class="btn btn-terciary" id='read-rfid' type='button'>Ler Ultimo Cartão</button> 
+                        </div> 
+                    </div>
                     <button class="btn btn-terciary" id='add-more' type='button'>Adicionar Cartão</button>
                     {% endif %}
 					
@@ -230,14 +241,33 @@
 
     <script>
         $(document).ready(function(){
-            console.log('ready');
-            $('#add-more').on('click', function(){
-                console.log('add-more');
+            function addRFIDField(){
                 if ($('.rfid-form').last().find('input').first().val().trim() != '') {
 					$('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) + 1);
 					$('#rfid-form-list').append("<div id=\"form-" + (parseInt($('#id_form-TOTAL_FORMS').val())-1) + "\"class=\"rfid-form\">{{ rfidFormset.empty_form.as_table | escapejs}}</div>");
 					$('.rfid-form').last().html($('.rfid-form').last().html().replace(/__prefix__/g, (parseInt($('#id_form-TOTAL_FORMS').val())-1)));
 				}
+            }
+
+            // Add more RFID regions
+            $('#add-more').on('click', function(){
+                addRFIDField();                
+            });
+        
+            $('#read-rfid').on('click', function(){
+                console.log("read-rfid");
+                $.ajax({
+                    url: '/fetchrfid/',
+                    type: 'GET',
+                    success: function(response) {
+                        var data =  response.rfid;
+                        console.log(data);
+                        if ($('.rfid-form').last().find('input').first().val().trim() != '') {
+                            addRFIDField();
+                        }
+                        $('.rfid-form').last().find('input').first().val(data);
+                    }
+                });
             });
         })
     </script>

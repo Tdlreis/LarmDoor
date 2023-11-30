@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("userform.urls")),
     path("", include("usertable.urls")),
+    path("", include("mqtt.urls")),
 ]

@@ -25,19 +25,9 @@ def table(request):
 
     return render(request, 'usertable.html', context)
 
-def delete(request, pk, model):
-    if(model == 1):
-        db = User.objects.get(pk=pk)
-        db.delete()
-    elif(model == 2):
-        db = User.objects.get(pk=pk)
-        db.delete()
-    elif(model == 3):
-        db = UserDoor.objects.get(pk=pk)
-        db.delete() 
-    elif(model == 4):
-        db = User.objects.get(pk=pk)
-        db.delete()
+def delete(request, pk):
+    db = User.objects.get(pk=pk)
+    db.delete()
     return redirect('table')
 
 def update(request, pk, model):
@@ -46,6 +36,7 @@ def update(request, pk, model):
     studentForm = None
     userDoorForm = None 
     rfidFormset = None
+    userSystemForm = None
     if model == 1:
         obj = get_object_or_404(User, pk=pk)
         userForm = UserForm(request.POST or None, instance=obj)

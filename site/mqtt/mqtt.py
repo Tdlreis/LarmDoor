@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 from django.conf import settings
-from userform.models import UserDoor, Rfid
+from userform.models import Rfid, UserDoor, PunchCard
 from django.utils import timezone
 from cryptography.fernet import Fernet
 import time
@@ -11,8 +11,11 @@ lastRfid = None
 
 def getLastRfid():
     global lastRfid
+    print("getLastRfid")
+    print(lastRfid)
     temp = lastRfid
     lastRfid = None
+    print(temp)
     return temp
 
 def on_connect(client, userdata, flags, rc):
@@ -35,19 +38,28 @@ def on_message(client, userdata, msg):
             rfid = Rfid.objects.get(rfid_uid=lastRfid)
             user = rfid.user
 
-            if user.expiration_date < timezone.now().date():
+            if user.expiration_date is not None and user.expiration_date < timezone.now().date():
                 user.authorization = False
                 user.save()
-                client.publish("door/notauth", " ")
-            elif not user.authorization:
-                client.publish("door/notauth", " ")
+                client.publish("door/notauth", "expired")
+                print("door/notauth - Data de expiração vencida")
+            elif not user.user.authorization:
+                client.publish("door/notauth", "usernotauth")
+                print("door/notauth - Usuário não autorizado")
             elif not rfid.authorization:
-                client.publish("door/notauth", " ")
+                client.publish("door/notauth", "cardnotauth")
+                print("door/notauth - Cartão não autorizado")
             else:
-                client.publish("door/enter", user.nickname)
                 topic_parts = msg.topic.split('/')
-                last_part = topic_parts[-1]
-                print(last_part)
+                if topic_parts[-1] == 'outside':
+                    client.publish("door/enter", user.nickname)
+                    print("door/enter " + user.nickname)
+                    punch_in(user.pk)
+                elif topic_parts[-1] == 'inside':
+                    client.publish("door/exit", user.nickname)
+                    print("door/exit " + user.nickname)
+                    punch_out(user.pk)
+
                 # if last_part == 'in':
                 #     punch_in(user.pk)
                 # elif last_part == 'out':
@@ -57,8 +69,7 @@ def on_message(client, userdata, msg):
             print("Não encontrado")
             client.publish("door/notopen", " ")
             pass
-        
-    
+ 
 def on_disconnect(client, userdata, rc):
     client.loop_stop()
     mqtt_thread = threading.Thread(target=establish_mqtt_connection)
@@ -95,3 +106,23 @@ def establish_mqtt_connection():
             print(f"Socket connection error: {e}")
             # time.sleep(1)
 
+def punch_in(user_id):
+    user = UserDoor.objects.get(pk=user_id)
+    current_time = timezone.now()
+    last_punch = user.punchcard_set.last()
+
+    PunchCard.objects.create(user=user, punch_in_time=current_time, out=True)
+
+
+def punch_out(user_id):
+    user = UserDoor.objects.get(pk=user_id)
+    current_time = timezone.now()
+    last_punch = user.punchcard_set.last()
+
+    if last_punch.punch_out_time == None:
+        last_punch.out = False
+        last_punch.punch_out_time = current_time
+        last_punch.save()
+    else:
+        print("Teste")
+        PunchCard.objects.create(user=user, punch_out_time=current_time, out=True)
