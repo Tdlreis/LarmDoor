@@ -19,6 +19,9 @@ def is_the_user(user, id):
     return True
     
 def format_hour(inTime):
+    if inTime == 0:
+        return "0s"
+    
     time = timedelta(seconds=inTime)
     hourString = ""
     minuteString = ""
@@ -32,16 +35,23 @@ def format_hour(inTime):
         time = time - timedelta(minutes=int(time.total_seconds() / 60))
     if time.total_seconds() > 0:
         secondString = str(int(time.total_seconds())) + "s"
-
+    
     return hourString + " " + minuteString + " " + secondString
         
 # @login_required
 def hours(request, id):
     if not is_the_user(request.user, id):
         return redirect('index')
+    
     data = []
     try:
-        punch_cards = PunchCard.objects.filter(user=id, punch_out_time__isnull=False, punch_in_time__isnull=False)
+        punch_cards = PunchCard.objects.filter(user=id)    
+        errors = 0
+        for p in punch_cards:
+            if p.punch_in_time == None or p.punch_out_time == None:
+                errors = errors + 1
+                punch_cards = punch_cards.exclude(pk=p.pk)
+
         start_date = punch_cards.earliest('punch_in_time').punch_in_time.date()
         end_date = punch_cards.latest('punch_in_time').punch_in_time.date()
 
@@ -49,18 +59,24 @@ def hours(request, id):
 
         while current_date <= end_date:
             next_date = current_date + timedelta(days=7)
-            time = PunchCard.objects.filter(user=id, punch_in_time__range=[current_date, next_date], punch_out_time__isnull=False, reviw=True)
-            hour = 0
+            time = PunchCard.objects.filter(user=id, punch_in_time__range=[current_date, next_date], punch_out_time__isnull=False, punch_in_time__isnull=False)
+            hourVal = 0
+            hoursNotVal = 0
             for t in time:
-                hour = hour + (t.punch_out_time - t.punch_in_time).total_seconds()
+                if t.reviw == True:
+                    hourVal = hourVal + (t.punch_out_time - t.punch_in_time).total_seconds()
+                else:
+                    hoursNotVal = hoursNotVal + (t.punch_out_time - t.punch_in_time).total_seconds()
+
             
             values = {
                 'start': current_date,
                 'end': (next_date - timedelta(days=1)),
-                'hours': format_hour(hour),
+                'hoursVal': format_hour(hourVal),
+                'hoursNotVal': format_hour(hoursNotVal),
             }
             current_date = next_date
-            if hour > 0:
+            if hourVal > 0 or hoursNotVal > 0:
                 data.append(values)
 
         data.reverse()
@@ -68,6 +84,7 @@ def hours(request, id):
             'data': data,
             'user': id,
             'staff': request.user.is_staff,
+            'errors': errors,
         }
     except PunchCard.DoesNotExist:
         context = {
@@ -83,12 +100,12 @@ def hours(request, id):
 def get_data(request, cat, id):
     if not is_the_user(request.user, id):
         return redirect('index')
-    punch_cards = PunchCard.objects.filter(user=id)
     
     data = []
 
     locale.setlocale(locale.LC_TIME, 'pt_BR.utf8')
     if cat == 4:
+        punch_cards = PunchCard.objects.filter(user=id)
         for p in punch_cards:
             if p.reviw == True:
                 validado = "Sim",
@@ -121,6 +138,7 @@ def get_data(request, cat, id):
             data.append(values)
         data.reverse()
     else:
+        punch_cards = PunchCard.objects.filter(user=id, punch_out_time__isnull=False, punch_in_time__isnull=False)
         start_date = punch_cards.earliest('punch_in_time').punch_in_time.date()
         end_date = punch_cards.latest('punch_in_time').punch_in_time.date()
         
@@ -134,18 +152,23 @@ def get_data(request, cat, id):
                 next_date = current_date + timedelta(days=365)
             elif cat == 3:
                 next_date = current_date + timedelta(days=7)
-            time = PunchCard.objects.filter(user=id, punch_in_time__range=[current_date, next_date], punch_out_time__isnull=False, reviw=True)
-            hour = 0
+            time = PunchCard.objects.filter(user=id, punch_in_time__range=[current_date, next_date], punch_out_time__isnull=False, punch_in_time__isnull=False)
+            hourVal = 0
+            hoursNotVal = 0
             for t in time:
-                hour = hour + (t.punch_out_time - t.punch_in_time).total_seconds()
+                if t.reviw == True:
+                    hourVal = hourVal + (t.punch_out_time - t.punch_in_time).total_seconds()
+                else:
+                    hoursNotVal = hoursNotVal + (t.punch_out_time - t.punch_in_time).total_seconds()
 
             values = {
                 'start': current_date.strftime('%d de %B de %Y').replace(current_date.strftime('%d de %B de %Y').split()[2], current_date.strftime('%d de %B de %Y').split()[2].capitalize()),
                 'end': (next_date - timedelta(days=1)).strftime('%d de %B de %Y').replace(next_date.strftime('%d de %B de %Y').split()[2], next_date.strftime('%d de %B de %Y').split()[2].capitalize()),
-                'hours': format_hour(hour),
+                'hoursVal': format_hour(hourVal),
+                'hoursNotVal': format_hour(hoursNotVal),
             }
             current_date = next_date
-            if hour > 0:
+            if hourVal > 0 or hoursNotVal > 0:
                 data.append(values)
         data.reverse()
 

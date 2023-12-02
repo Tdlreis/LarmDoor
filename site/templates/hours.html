@@ -39,24 +39,28 @@
                 <a href="#" class="btn btn-sm btn-primary" id="btn-mes">Mês</a>
                 <a href="#" class="btn btn-sm btn-primary" id="btn-ano">Ano</a>
                 <a href="#" class="btn btn-sm btn-primary" id="btn-log">Log</a>
+                <a href="/" class="btn btn-secondary ml-2">Voltar</a>
             </div>
         </div>
                 
         
         <div class="row justify-content-center">
+            <p>Erros: {{errors}}</p>
             <div class="col-12">
                 <table class="table table-bordered table-striped" id="table">
                     <thead class="thead-dark">
                         <tr id=header-row>
                             <th scope="col">Semana</th>
-                            <th scope="col">Horas</th>
+                            <th scope="col">Horas Validadas</th>
+                            <th scope="col">Horas Não Validadas</th>
                         </tr>
                     </thead>
                     <tbody id = "body-row">
                         {% for d in data %}
                         <tr>
                             <td>{{ d.start }} - {{ d.end }}</td>
-                            <td>{{ d.hours }}</td>                            
+                            <td>{{ d.hoursVal }}</td>
+                            <td>{{ d.hoursNotVal }}</td>
                         </tr>
                         {% empty %}
                         <tr>
@@ -82,11 +86,12 @@
                     
                         var table = $('#table');
                         table.empty();  // Clear existing table data
+                        
 
-                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Mês</th><th scope="col">Horas</th></tr></thead>');
+                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Mês</th><th scope="col">Horas Validadas</th><th scope="col">Horas Não Validadas</th></tr></thead>');
                         table.append('<tbody>');
                         for (var i = 0; i < data.length; i++) {
-                            table.append('<tr><td>' + data[i].start + ' - ' + data[i].end + '</td><td>' + data[i].hours + '</td></tr>');
+                            table.append('<tr><td>' + data[i].start + ' - ' + data[i].end + '</td><td>' + data[i].hoursVal + '</td><td>' + data[i].hoursNotVal + '</td></tr>');
                         }            
                         table.append('</tbody>');
                     }
@@ -103,10 +108,10 @@
                         var table = $('#table');
                         table.empty();  // Clear existing table data
 
-                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Dia</th><th scope="col">Horas</th></tr></thead>');
+                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Dia</th><th scope="col">Horas Validadas</th><th scope="col">Horas Não Validadas</th></tr></thead>');
                         table.append('<tbody>');
                         for (var i = 0; i < data.length; i++) {
-                            table.append('<tr><td>' + data[i].start + '</td><td>' + data[i].hours + '</td></tr>');
+                            table.append('<tr><td>' + data[i].start + '</td><td>' + data[i].hoursVal + '</td><td>' + data[i].hoursNotVal + '</td></tr>');
                         }            
                         table.append('</tbody>');
                     }
@@ -123,10 +128,10 @@
                         var table = $('#table');
                         table.empty();  // Clear existing table data
 
-                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Ano</th><th scope="col">Horas</th></tr></thead>');
+                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Ano</th><th scope="col">Horas Validadas</th><th scope="col">Horas Não Validadas</th></tr></thead>');
                         table.append('<tbody>');
                         for (var i = 0; i < data.length; i++) {
-                            table.append('<tr><td>' + data[i].start + ' - ' + data[i].end + '</td><td>' + data[i].hours + '</td></tr>');
+                            table.append('<tr><td>' + data[i].start + ' - ' + data[i].end + '</td><td>' + data[i].hoursVal + '</td><td>' + data[i].hoursNotVal + '</td></tr>');
                         }            
                         table.append('</tbody>');
                     }
@@ -143,10 +148,10 @@
                         var table = $('#table');
                         table.empty();  // Clear existing table data
 
-                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Semana</th><th scope="col">Horas</th></tr></thead>');
+                        table.append('<thead class="thead-dark"><tr id=header-row><th scope="col">Semana</th><th scope="col">Horas Validadas</th><th scope="col">Horas Não Validadas</th></tr></thead>');
                         table.append('<tbody>');
                         for (var i = 0; i < data.length; i++) {
-                            table.append('<tr><td>' + data[i].start + ' - ' + data[i].end + '</td><td>' + data[i].hours + '</td></tr>');
+                            table.append('<tr><td>' + data[i].start + ' - ' + data[i].end + '</td><td>' + data[i].hoursVal + '</td><td>' + data[i].hoursNotVal + '</td></tr>');
                         }            
                         table.append('</tbody>');
                     }
