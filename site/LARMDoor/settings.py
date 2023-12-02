@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'userform.apps.UserformConfig',
     'usertable.apps.UsertableConfig',
     'mqtt.apps.MqttConfig',
+    'hours.apps.HoursConfig',
 ]
 
 MIDDLEWARE = [

@@ -21,4 +21,5 @@ urlpatterns = [
     path("", include("userform.urls")),
     path("", include("usertable.urls")),
     path("", include("mqtt.urls")),
+    path("", include("hours.urls")),
 ]

@@ -111,8 +111,7 @@ def punch_in(user_id):
     current_time = timezone.now()
     last_punch = user.punchcard_set.last()
 
-    PunchCard.objects.create(user=user, punch_in_time=current_time, out=True)
-
+    PunchCard.objects.create(user=user, punch_in_time=current_time)
 
 def punch_out(user_id):
     user = UserDoor.objects.get(pk=user_id)
@@ -124,5 +123,4 @@ def punch_out(user_id):
         last_punch.punch_out_time = current_time
         last_punch.save()
     else:
-        print("Teste")
-        PunchCard.objects.create(user=user, punch_out_time=current_time, out=True)
+        PunchCard.objects.create(user=user, punch_out_time=current_time)

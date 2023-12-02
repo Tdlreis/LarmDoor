@@ -81,4 +81,3 @@ class PunchCard(models.Model):
     punch_in_time = models.DateTimeField(null=True, blank=True)    
     punch_out_time = models.DateTimeField(null=True, blank=True)
     reviw =  models.BooleanField(default=False)
-    out  = models.BooleanField(default=True)
