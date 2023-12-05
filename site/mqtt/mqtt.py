@@ -118,7 +118,7 @@ def punch_out(user_id):
     current_time = timezone.now()
     last_punch = user.punchcard_set.last()
 
-    if last_punch.punch_out_time == None:
+    if last_punch != None and last_punch.punch_out_time == None:
         last_punch.out = False
         last_punch.punch_out_time = current_time
         last_punch.save()

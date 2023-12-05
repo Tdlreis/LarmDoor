@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'usertable.apps.UsertableConfig',
     'mqtt.apps.MqttConfig',
     'hours.apps.HoursConfig',
+    'review.apps.ReviewConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,8 +134,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # MQTT
 # MQTT_SERVER = '192.168.3.46'
-MQTT_SERVER = '192.168.3.82'
-# MQTT_SERVER = '192.168.252.134'
+# MQTT_SERVER = '192.168.3.82'
+MQTT_SERVER = '192.168.252.134'
 MQTT_PORT = 1883
 MQTT_KEEPALIVE = 60
 MQTT_USER = 'Server'

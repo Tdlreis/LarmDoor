@@ -241,10 +241,7 @@ void setup(){
 
 }
 
-void loop(){
-	if(WiFi.status() != WL_CONNECTED){
-		wifiStartup();
-	}
+void loop(){	
 	// Verifica se a conexão com o broker MQTT está ativa e reconecta-se, se necessário
 	if (!mqttClient.connected()) {
 		reconnect();

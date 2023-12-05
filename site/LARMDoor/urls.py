@@ -22,4 +22,5 @@ urlpatterns = [
     path("", include("usertable.urls")),
     path("", include("mqtt.urls")),
     path("", include("hours.urls")),
+    path("", include("review.urls")),
 ]

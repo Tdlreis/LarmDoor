@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Porta Eletrônica</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .logo-section {
+            max-width: 300px;
+            margin: 0;
+            padding: 0;
+            text-align: left;
+        }
+
+        .vertical-align-center {
+            display: flex;
+            align-items: center;
+        }
+
+        input{
+            border: none;
+            border-radius: 5px;
+            background-color: #e1e1e1;
+            padding: 10px;
+            width: 100%;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #333;
+            transition: background-color 0.3s ease;
+        }
+            
+        td{
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+            
+        <div class="row justify-content-between vertical-align-center">
+            <div class="col-3 pt-2 pb-2">
+                <h1 class="logo-section">Porta Eletrônica</h1>
+            </div>
+            <div class="col-4 pt-2 pb-2 text-right">
+                <a href="/" class="btn btn-secondary ml-2">Voltar</a>
+            </div>
+        </div>
+                
+        
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <table class="table table-bordered table-striped" id="table">
+                    <thead class="thead-dark">
+                        <tr id=header-row>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Entrada</th>
+                            <th scope="col">Saida</th>
+                            <th scope="col">Horas</th>
+                            <th scope="col">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id = "body-row">
+                        {% for d in data %}
+                        <tr id="{{ d.id }}">
+                            <td>{{ d.name }}</td>
+                            <td>{{ d.form.punch_in_time }}</td>
+                            <td>{{ d.form.punch_out_time }}</td>                          
+                            <td>{{ d.hours }}</td>
+                            <td>
+                                <a name="{{ d.id }}" class="btn btn-light btn-validation">
+                                    <span class="bi bi-check2-square"></span>
+                                </a>
+                                <a name="{{ d.id }}" class="btn btn-light btn-delete">
+                                    <span class="bi bi-trash"></span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">Todos os registros validados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            var size = "{{ data|length }}";
+            console.log(size);
+            $('.btn-validation').click(function() {
+                var register_id = $(this).attr('name');
+                $.ajax({
+                    url: '/review/'+register_id+'/',
+                    type: 'POST',
+                    data: {
+                        'punch_in_time': $(this).closest('tr').find('td').eq(1).find('input').val(),
+                        'punch_out_time': $(this).closest('tr').find('td').eq(2).find('input').val(),
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        var data =  response.data;
+
+                        var validated = $('#' + register_id);
+                        validated.remove();
+
+                        
+                        size--;
+                        if(size < 1){
+                            var body = $('#body-row');
+                            body.append('<tr><td colspan="5">Todos os registros validados.</td></tr>');
+                        }
+                    }
+                });
+            });   
+            $('.btn-delete').click(function() {
+                var register_id = $(this).attr('name');
+                $.ajax({
+                    url: '/review/'+register_id+'/delete/',
+                    type: 'GET',
+                    success: function(response) {
+                        var data =  response.data;
+
+                        var validated = $('#' + register_id);
+                        validated.remove();
+
+                        
+                        size--;
+                        if(size < 1){
+                            var body = $('#body-row');
+                            body.append('<tr><td colspan="5">Todos os registros validados.</td></tr>');
+                        }
+                    }
+                });
+            });
+            
+            function format_hour(inTime) {
+                inTime = Math.floor(inTime / 1000);
+                if (inTime == 0) {
+                    return "0s";
+                }
+
+                console.log(inTime);
+
+                var hours = Math.floor(inTime / 3600);
+                console.log(hours);
+                var minutes = Math.floor((inTime % 3600) / 60);
+                console.log(minutes);
+                var seconds = Math.floor(inTime % 60);
+                console.log(seconds);
+
+                var hourString = hours > 0 ? hours + "h " : "";
+                var minuteString = minutes > 0 ? minutes + "m " : "";
+                var secondString = seconds > 0 ? seconds + "s" : "";
+
+                return hourString + minuteString + secondString;
+            }
+
+            $('input').change(function() {
+                var punch_in = $(this).closest('tr').find('td').eq(1).find('input').val();
+                var punch_out = $(this).closest('tr').find('td').eq(2).find('input').val();
+                
+                var difference = 0
+
+                if(punch_in == "" || punch_out == ""){
+                    difference = "Error";
+                }
+                else{
+                    var date1 = new Date(punch_in);
+                    var date2 = new Date(punch_out);
+                    difference = format_hour(date2.getTime() - date1.getTime());
+                    console.log(date2.getTime() - date1.getTime());
+                }
+
+                $(this).closest('tr').find('td').eq(3).text(difference);   
+            });
+        });
+    </script>
+</body>
+</html>
