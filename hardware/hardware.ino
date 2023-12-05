@@ -30,7 +30,9 @@ PubSubClient mqttClient(wifiClient);
 // const char* MQTT_BROKER_IP_ADDRESS = "192.168.3.46";
 // const char* MQTT_BROKER_IP_ADDRESS = "172.190.138.174";
 // const char* MQTT_BROKER_IP_ADDRESS = "192.168.3.82";
-const char* MQTT_BROKER_IP_ADDRESS = "192.168.252.134";
+// const char* MQTT_BROKER_IP_ADDRESS = "192.168.252.134";
+const char* MQTT_BROKER_IP_ADDRESS = "150.162.234.90";
+
 const char* MQTTUSERNAME = "Esp32";
 const char* MQTTPWD = "JIa6sEtBt1JEmqm";
 

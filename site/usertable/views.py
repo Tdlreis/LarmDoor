@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.forms import modelformset_factory
+from django.contrib.auth.decorators import login_required
 
 
 from userform.models import User, Student, Rfid, UserDoor, UserSystem
 from usertable.forms import UserForm, StudentForm, RfidForm, UserDoorFormProfessor, UserDoorForm, UserSystemForm
 
 # Create your views here.
+@login_required
 def table(request):
     professores = User.objects.select_related('usersystem').filter(user_type=2)
 
@@ -25,11 +27,13 @@ def table(request):
 
     return render(request, 'usertable.html', context)
 
+@login_required
 def delete(request, pk):
     db = User.objects.get(pk=pk)
     db.delete()
     return redirect('table')
 
+@login_required
 def update(request, pk, model):
     obj = None 
     userForm = None
