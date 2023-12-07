@@ -2,9 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.forms.models import modelformset_factory
 from userform.forms import UserForm, StudentForm, RfidForm, UserSystemForm, UserDoorForm
-from .models import User, Rfid
-from django.http import JsonResponse
+from .models import Rfid
 
+from django.contrib.auth.decorators import login_required, user_passes_test
+from usertable.views import admin_chek
+
+@login_required
+@user_passes_test(admin_chek, login_url='table')
 def create(request):
     userForm = UserForm(request.POST or None)
     userSystemForm = UserSystemForm(request.POST or None)

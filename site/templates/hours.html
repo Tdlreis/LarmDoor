@@ -39,7 +39,11 @@
                 <a href="#" class="btn btn-sm btn-primary" id="btn-mes">Mês</a>
                 <a href="#" class="btn btn-sm btn-primary" id="btn-ano">Ano</a>
                 <a href="#" class="btn btn-sm btn-primary" id="btn-log">Log</a>
+                {% if admin %}
                 <a href="/" class="btn btn-secondary ml-2">Voltar</a>
+                {% else %}
+                <a href="{% url 'logout' %}?next={% url 'table' %}" class="btn btn-sm btn-danger">Logout</a>
+                {% endif %}
             </div>
         </div>
                 

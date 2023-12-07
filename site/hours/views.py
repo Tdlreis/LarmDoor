@@ -6,16 +6,15 @@ from datetime import timedelta
 import locale
 
 def is_the_user(user, id):
-    # try:
-    #     door_user = User.objects.get(pk=id)
-    #     if user.is_staff == True:
-    #         return True
-    #     if user.first_name != door_user.user_name:
-    #         return False
-    #     else:
-    #         return True
-    # except User.DoesNotExist:
-    #     return False
+    try:
+        if user.is_admin == True:
+            return True
+        if user.user.pk != id:
+            return False
+        else:
+            return True
+    except User.DoesNotExist:
+        return False
     return True
     
 def format_hour(inTime):
@@ -38,10 +37,10 @@ def format_hour(inTime):
     
     return hourString + " " + minuteString + " " + secondString
         
-# @login_required
+@login_required
 def hours(request, id):
     if not is_the_user(request.user, id):
-        return redirect('index')
+        return redirect('table')
     
     data = []
     try:
@@ -83,23 +82,23 @@ def hours(request, id):
         context = {
             'data': data,
             'user': id,
-            'staff': request.user.is_staff,
+            'admin': request.user.is_admin,
             'errors': errors,
         }
     except PunchCard.DoesNotExist:
         context = {
             'data': data,
             'user': id,
-            'staff': request.user.is_staff,
+            'admin': request.user.is_admin,
         }
         pass
 
     return render(request, 'hours.html', context)
 
-# @login_required
+@login_required
 def get_data(request, cat, id):
     if not is_the_user(request.user, id):
-        return redirect('index')
+        return redirect('table')
     
     data = []
 

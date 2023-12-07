@@ -5,11 +5,11 @@ from django.http import JsonResponse
 from .forms import PunchCardForm
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-# from userform.views import staff_chek
+from userform.views import admin_chek
 
 # Create your views here.
-# @login_required
-# @user_passes_test(staff_chek, login_url='index')
+@login_required
+@user_passes_test(admin_chek, login_url='table')
 def reviewlist(request):
     data = []
     try:
@@ -51,8 +51,8 @@ def reviewlist(request):
 
     return render(request, 'review.html', context)
 
-# @login_required
-# @user_passes_test(staff_chek, login_url='index')
+@login_required
+@user_passes_test(admin_chek, login_url='table')
 def review(request, id):
     if request.method == 'POST':
         punch_card = PunchCard.objects.get(id=id)
@@ -63,6 +63,8 @@ def review(request, id):
 
     return JsonResponse({'success': True})
 
+@login_required
+@user_passes_test(admin_chek, login_url='table')
 def delete(request, id):
     punch_card = PunchCard.objects.get(id=id)
     punch_card.delete()
