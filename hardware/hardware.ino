@@ -21,8 +21,8 @@
 #define buzzer D8
 
 //WiFi
-const char* ssid     = "TDLRMobile";
-const char* password = "291234Reis";
+const char* ssid     = "LARM_ALUNOS";
+const char* password = "LarmUfscq2022";
 
 //MQTT
 WiFiClient wifiClient;

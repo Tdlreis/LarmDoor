@@ -44,9 +44,17 @@ class UserSystem(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+
     def save(self, *args, **kwargs):
-        print("Chamou")
-        self.password = make_password(self.password)
+        print(self.password)
+        print(self.user)
+        try:
+            orig = UserSystem.objects.get(user=self.user)
+            if orig.password != self.password:
+                self.password = make_password(self.password)
+        except UserSystem.DoesNotExist:
+            self.password = make_password(self.password)
+
         super(UserSystem, self).save(*args, **kwargs)
 
     class Meta:
