@@ -3,6 +3,9 @@ from django.urls import reverse
 from django.forms import modelformset_factory
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import logout
+from django.contrib import messages
+from django.db.models.deletion import ProtectedError
+
 
 from userform.models import User, Student, Rfid, UserDoor, UserSystem
 from usertable.forms import UserForm, StudentForm, RfidForm, UserDoorFormProfessor, UserDoorForm, UserSystemForm
@@ -38,8 +41,17 @@ def table(request):
 @user_passes_test(admin_chek, login_url='table')
 def delete(request, pk):
     db = User.objects.get(pk=pk)
-    db.delete()
-    return redirect('table')
+    try:
+        db.delete()
+        return redirect('table')
+    except ProtectedError as e:
+        message = "Não é possível deletar o professor, pois há alunos Orientados por ele. \\nOs Alunos são:"
+        students = db.coordinator.all()
+        for student in students:
+            message += "\\n" + student.user.full_name
+        print(message)
+        messages.error(request, message)
+        return redirect('table')
 
 @login_required
 @user_passes_test(admin_chek, login_url='table')

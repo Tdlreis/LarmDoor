@@ -13,7 +13,7 @@ from userform.views import admin_chek
 def reviewlist(request):
     data = []
     try:
-        nonValidated = PunchCard.objects.filter(reviw=False).order_by('punch_in_time')
+        nonValidated = PunchCard.objects.filter(reviw=False)
         for n in nonValidated:
             values = {
                 'name': n.user.user.full_name,

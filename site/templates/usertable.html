@@ -20,6 +20,12 @@
     }
 </style>
 
+
+{% for message in messages %}
+    <script>alert('{{ message }}');</script>
+{% endfor %}
+
+
 <div class="container-fluid">
     <div class="row justify-content-between vertical-align-center">
         <div class="col-3 pt-2 pb-2">
@@ -33,7 +39,7 @@
 
     </div>
 
-    <div class="row justify-content-center">
+    <div class="row justify-content-center">        
         <div class="col-12">
             <h2>Professores</h2>
             <table class="table table-bordered table-striped">

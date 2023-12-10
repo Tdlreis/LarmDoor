@@ -189,6 +189,12 @@
 
     <script>
         $(document).ready(function(){
+            $(window).keydown(function(event) {
+                if (event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+                }
+            });
             // Functions to change Types and forms dinamically
             function addUserSystemForm(){
                 $('#dinamicArea').append("{% for fm in userSystemForm %}<div class= \"form-group user{{forloop.counter0}}\"><p>{{fm.errors | escapejs}}</p><label>{{fm.label}}</label><p>{{fm | escapejs}}</p></div>{% endfor %}");
