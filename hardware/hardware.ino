@@ -14,11 +14,10 @@
 //Config RfID ports
 #define RST_PIN D0
 #define SS_PIN0 D3
-#define SS_PIN1 D4
+#define SS_PIN1 D8
 
 //Config Button and Locker ports
-#define locker 2
-#define buzzer D8
+#define locker D4
 
 //WiFi
 const char* ssid     = "LARM_ALUNOS";
@@ -29,9 +28,10 @@ WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 // const char* MQTT_BROKER_IP_ADDRESS = "192.168.3.46";
 // const char* MQTT_BROKER_IP_ADDRESS = "172.190.138.174";
+const char* MQTT_BROKER_IP_ADDRESS = "150.162.234.67";
 // const char* MQTT_BROKER_IP_ADDRESS = "192.168.3.82";
 // const char* MQTT_BROKER_IP_ADDRESS = "192.168.252.134";
-const char* MQTT_BROKER_IP_ADDRESS = "150.162.234.90";
+// const char* MQTT_BROKER_IP_ADDRESS = "150.162.234.90";
 
 const char* MQTTUSERNAME = "Esp32";
 const char* MQTTPWD = "JIa6sEtBt1JEmqm";
@@ -89,34 +89,48 @@ void openDoor(String name, bool enter){
 		lcd.print("Volte Logo");
 	}
 	
-	lcd.setCursor(0, (name.length()/2)-8);
+	lcd.setCursor((name.length()/2)-8, 1);
 	lcd.print(name);
 
-
-	delay(1000);
 	digitalWrite(locker,HIGH);
-	delay(100);
+	delay(1000);
 	digitalWrite(locker,LOW);
 
-	timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
-	timer1_write(5000000);
+	timer1_enable(TIM_DIV256, TIM_EDGE, TIM_SINGLE);
+	timer1_write(1562500);
 	
 }
 
-void notOpenDoor(bool auth){
+void notOpenDoor(String name, int auth){
 	lcd.clear();
-	lcd.setCursor(5,0);
-	lcd.print("Cartao");
-	lcd.setCursor(1,3);
-	if(auth){
-		lcd.print("Nao autorizado");
-	}
-	else{
+	if(auth == 0){
+		lcd.setCursor(5,0);
+		lcd.print("Cartao");
+		lcd.setCursor(0,1);
 		lcd.print("Nao cadastrado");
 	}
+	else{
+		lcd.setCursor(0, 0);
+		lcd.print(name);
+		if (auth == 1)
+		{
+			lcd.setCursor(0,1);
+			lcd.print("Usuario Vencido");
+		}
+		else if (auth == 2)
+		{
+			lcd.setCursor(0,1);
+			lcd.print("Usuario n Auth");
+		}
+		else if (auth == 3)
+		{
+			lcd.setCursor(0,1);
+			lcd.print("Cartão n Auth");
+		}		
+	}
 
-	timer1_enable(TIM_DIV16, TIM_EDGE, TIM_SINGLE);
-	timer1_write(5000000);
+	timer1_enable(TIM_DIV256, TIM_EDGE, TIM_SINGLE);
+	timer1_write(1562500);
 }
 
 //MQTT
@@ -133,11 +147,7 @@ void reconnect() {
 		}
 		Serial.println("Tentando reconectar ao broker MQTT...");
 		if (mqttClient.connect("ESP32Client", MQTTUSERNAME, MQTTPWD)) {		
-			Serial.println("Reconectado ao broker MQTT!");
-			// mqttClient.subscribe("door/enter");
-			// mqttClient.subscribe("door/leave");
-			// mqttClient.subscribe("door/notopen");			
-			// mqttClient.subscribe("door/notauth");			
+			Serial.println("Reconectado ao broker MQTT!");	
 			mqttClient.subscribe("door/#");			
 			mqttClient.subscribe("server/status");
 			Serial.println("Conectado ao broker MQTT!");
@@ -160,11 +170,17 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 	else if(strcmp(topic, "door/exit") == 0){
 		openDoor(message, false);
 	}
-	else if(strcmp(topic, "door/notopen") == 0){
-		notOpenDoor(false);
+	else if(strcmp(topic, "door/unknown") == 0){
+		notOpenDoor("", 0);
 	}
-	else if(strcmp(topic, "door/notauth") == 0){
-		notOpenDoor(true);
+	else if(strcmp(topic, "door/expired") == 0){
+		notOpenDoor(message, 1);
+	}
+	else if(strcmp(topic, "door/notauthu") == 0){
+		notOpenDoor(message, 2);
+	}
+	else if(strcmp(topic, "door/notauthc") == 0){
+		notOpenDoor(message, 3);
 	}
 	else if (strcmp(topic, "server/status") == 0)
 	{
@@ -219,7 +235,6 @@ void setup(){
 	lcd.clear();
 
 	pinMode(locker, OUTPUT);
-	pinMode(buzzer, OUTPUT);
 
 	wifiStartup();
 	mqttStartup();

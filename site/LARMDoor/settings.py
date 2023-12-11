@@ -39,9 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'userform.apps.UserformConfig',
     'usertable.apps.UsertableConfig',
-    'mqtt.apps.MqttConfig',
+    # 'mqtt.apps.MqttConfig',
     'hours.apps.HoursConfig',
     'review.apps.ReviewConfig',
+    'serialMonitor.apps.SerialmonitorConfig'
 ]
 
 MIDDLEWARE = [
