@@ -9,4 +9,4 @@ class MqttConfig(AppConfig):
         from .mqtt import start_mqtt_handler
 
         # Start the MQTT handler when the Django application is ready
-        # start_mqtt_handler()
+        start_mqtt_handler()

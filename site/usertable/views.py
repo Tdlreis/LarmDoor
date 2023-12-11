@@ -151,7 +151,7 @@ def update(request, pk, model):
                     rfid = form.save(commit=False)
                     rfid.user = userDoor
                     rfid.save()
-                    return redirect(reverse('table'))
+            return redirect(reverse('table'))
 
     elif model == 4:
         obj = get_object_or_404(User, pk=pk)

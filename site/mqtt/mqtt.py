@@ -28,26 +28,19 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     if msg.topic.startswith("server/auth/"):
         try:
-            global lastRfid
-            lastRfid = msg.payload.decode("utf-8").upper()
-
-            # fernet = Fernet(settings.SECRET_KEY1);
-            # crypt = fernet.encrypt(lastRfid.encode()).decode()
-            # print(crypt)
-
-            rfid = Rfid.objects.get(rfid_uid=lastRfid)
+            rfid = Rfid.objects.get(rfid_uid=msg.payload.decode("utf-8").upper())
             user = rfid.user
 
             if user.expiration_date is not None and user.expiration_date < timezone.now().date():
                 user.authorization = False
                 user.save()
-                client.publish("door/notauth", "expired")
+                client.publish("door/expired", user.nickname)
                 print("door/notauth - Data de expiração vencida")
             elif not user.user.authorization:
-                client.publish("door/notauth", "usernotauth")
+                client.publish("door/notauthu", user.nickname)
                 print("door/notauth - Usuário não autorizado")
             elif not rfid.authorization:
-                client.publish("door/notauth", "cardnotauth")
+                client.publish("door/notauthc", user.nickname)
                 print("door/notauth - Cartão não autorizado")
             else:
                 topic_parts = msg.topic.split('/')
@@ -59,15 +52,12 @@ def on_message(client, userdata, msg):
                     client.publish("door/exit", user.nickname)
                     print("door/exit " + user.nickname)
                     punch_out(user.pk)
-
-                # if last_part == 'in':
-                #     punch_in(user.pk)
-                # elif last_part == 'out':
-                #     punch_out(user.pk)
    
         except Rfid.DoesNotExist:
+            global lastRfid
+            lastRfid = msg.payload.decode("utf-8").upper()
             print("Não encontrado")
-            client.publish("door/notopen", " ")
+            client.publish("door/unknown", " ")
             pass
  
 def on_disconnect(client, userdata, rc):
