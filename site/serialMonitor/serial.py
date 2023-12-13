@@ -34,8 +34,8 @@ def connect_to_serial(port, baudrate):
 
 
 def serial_connection():
-    ser1 = connect_to_serial("COM4", 9600)
-    ser2 = connect_to_serial("COM10", 9600)
+    ser1 = connect_to_serial("/dev/ttyUSB0", 9600)
+    ser2 = connect_to_serial("/dev/ttyACM0", 9600)
 
     while True:     
         try:      
@@ -51,7 +51,7 @@ def serial_connection():
                     punch_in(response.pk)
                     time.sleep(0.5)
         except:
-            ser1 = connect_to_serial("COM4", 9600)
+            ser1 = connect_to_serial("/dev/ttyUSB0", 9600)
         try:
             if ser2.in_waiting > 0:
                 teste = ser2.readline().decode('utf-8').strip().upper()
@@ -65,7 +65,7 @@ def serial_connection():
                     punch_out(response.pk)
                     time.sleep(0.5)
         except:
-            ser2 = connect_to_serial("COM10", 9600)
+            ser2 = connect_to_serial("/dev/ttyACM0", 9600)
 
 def chek_db(code):
     try:
@@ -98,16 +98,24 @@ def punch_in(user_id):
     current_time = timezone.now()
     last_punch = user.punchcard_set.last()
 
-    PunchCard.objects.create(user=user, punch_in_time=current_time)
+    if last_punch != None and last_punch.punch_in_time != None and (current_time - last_punch.punch_in_time).total_seconds() < 30:
+        last_punch.punch_in_time = current_time
+        last_punch.save()
+    else:
+        PunchCard.objects.create(user=user, punch_in_time=current_time)
 
 def punch_out(user_id):
     user = UserDoor.objects.get(pk=user_id)
     current_time = timezone.now()
     last_punch = user.punchcard_set.last()
-
+    
     if last_punch != None and last_punch.punch_out_time == None:
-        last_punch.out = False
         last_punch.punch_out_time = current_time
         last_punch.save()
     else:
-        PunchCard.objects.create(user=user, punch_out_time=current_time)
+        if last_punch != None and (current_time - last_punch.punch_out_time).total_seconds() < 30:
+            last_punch.punch_out_time = current_time
+            last_punch.save()
+        else:
+            PunchCard.objects.create(user=user, punch_out_time=current_time)
+

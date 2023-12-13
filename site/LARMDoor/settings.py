@@ -61,7 +61,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            "templates", 
+            "/home/larm/Desktop/LarmDoor/site/templates", 
         ],
         'APP_DIRS': True,
         'OPTIONS': {
