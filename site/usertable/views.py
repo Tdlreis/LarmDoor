@@ -68,6 +68,7 @@ def update(request, pk, model):
         userDoor = obj.userdoor
         userDoorForm = UserDoorFormProfessor(request.POST or None, instance=userDoor)
         userSystem = obj.usersystem
+        password = userSystem.password
         userSystemForm = UserSystemForm(request.POST or None, instance=userSystem)
         qs = userDoor.rfid_set.all()
         RfidFormFormset = modelformset_factory(Rfid, form=RfidForm, extra=0)
@@ -82,6 +83,8 @@ def update(request, pk, model):
             userDoor.save()
 
             userSystem = userSystemForm.save(commit=False)
+            if not userSystemForm.cleaned_data['password']:
+                userSystem.password = password
             userSystem.user = user
             userSystem.save()                
 
@@ -100,6 +103,7 @@ def update(request, pk, model):
         stuobj = obj.student
         studentForm = StudentForm(request.POST or None, instance=stuobj)
         userSystem = obj.usersystem
+        password = userSystem.password
         userSystemForm = UserSystemForm(request.POST or None, instance=userSystem)
         RfidFormFormset = modelformset_factory(Rfid, form=RfidForm, extra=0)
         qs = userDoor.rfid_set.all()
@@ -114,6 +118,8 @@ def update(request, pk, model):
             userDoor.save()
 
             userSystem = userSystemForm.save(commit=False)
+            if not userSystemForm.cleaned_data['password']:
+                userSystem.password = password
             userSystem.user = user
             userSystem.save()
 
@@ -157,6 +163,7 @@ def update(request, pk, model):
         obj = get_object_or_404(User, pk=pk)
         userForm = UserForm(request.POST or None, instance=obj)
         userSystem = obj.usersystem
+        password = userSystem.password
         userSystemForm = UserSystemForm(request.POST or None, instance=userSystem)
 
         if userForm.is_valid():
@@ -164,6 +171,8 @@ def update(request, pk, model):
             user.save()
 
             userSystem = userSystemForm.save(commit=False)
+            if not userSystemForm.cleaned_data['password']:
+                userSystem.password = password
             userSystem.user = user
             userSystem.save()
 

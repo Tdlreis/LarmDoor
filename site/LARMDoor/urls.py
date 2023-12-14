@@ -24,4 +24,5 @@ urlpatterns = [
     path("", include("serialMonitor.urls")),
     path("", include("hours.urls")),
     path("", include("review.urls")),
+    path("", include("minha_dashboard.urls")),
 ]

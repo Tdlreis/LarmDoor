@@ -32,11 +32,11 @@ class UserDoorFormProfessor(forms.ModelForm):
 
 class UserSystemForm(forms.ModelForm):
     email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput, required=False)
 
     class Meta:
         model = UserSystem
         fields = ['email', 'password','is_admin' ,'is_analist']
-        exclude = ['password']
 
 class StudentForm(forms.ModelForm):
     institution_code = forms.CharField(label="Matricula:", max_length=8)

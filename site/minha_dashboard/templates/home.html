@@ -1,0 +1,144 @@
+{% extends 'basegraficos.html' %}
+{% load static %}
+
+{% block 'titulo' %}Dashboard{% endblock %}
+
+{% block 'head' %}
+
+<link rel="stylesheet" href="{% static 'css/css.css' %}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/dist/css/bootstrap-icons.min.css" integrity="sha384-xe0YxFG8kIvJ/tVM2P0tZ013wGCU0cn/1ijdfo0dgt6z/m0Y5+52ia+Afq/K1z7" crossorigin="anonymous">
+
+{% endblock %}
+
+{% block 'body' %}
+
+<div class="container">
+    <div>
+
+        <label for="startdate">Data Inicial:</label>
+        <input type="date" id="startdate" name="startdate" style="border-radius: 0.25rem; margin: 20px 10px 10px 1px; ">
+
+        <label for="enddate">Data Final:</label>
+        <input type="date" id="enddate" name="enddate" style="border-radius: 0.25rem; margin: 20px 10px 10px 1px;">
+
+
+         <label for="dateMode">Modo de Data:</label>
+        <select  id="dateMode" name="dateMode" style="border-radius: 0.25rem; margin: 20px 10px 10px 1px;">
+            <option value=2>Dias</option>
+            <option value=1>Semanas</option>
+            <option value=0>Meses</option>
+        </select>
+
+        <button type="button" class="btn btn-primary" id="render-temp-btn">
+            <i class="bi bi-search"></i> Procurar
+        </button>
+        <button type="button" class="btn btn-secondary" id="reset-temp-btn">
+            <i class="bi bi-arrow-counterclockwise"></i> Padrão
+        </button>
+        <a href="/" class="btn btn-secondary ml-2">Voltar</a>
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="row">
+            <div class="col-md ">
+                <br>
+                <canvas id="tmp" width="80" height="30"></canvas>
+                </div>
+            <div class="col-md ">
+                <br>
+
+                <canvas id="hum" width="80" height="30"></canvas>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md ">
+                <br>
+
+                <canvas id="lux" width="80" height="30"></canvas>
+            </div>
+                <div class="col-md ">
+                <br>
+
+                <canvas id="volts" width="80" height="30"></canvas>
+             </div>
+        </div>
+
+
+
+
+    </div>
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/js.js' %}"></script>
+
+
+<script>
+  window.onload = function(e) {
+    gera_cor(qtd = 12)
+    renderiza_tmp('{% url "medias" %}')
+    renderiza_hum('{% url "medias" %}')
+    renderiza_lux('{% url "medias" %}')
+    renderiza_volts('{% url "medias" %}')
+  }
+
+  window.onresize = function(e) {
+    location.reload();
+  }
+
+
+  const BASE_URL = 'http://127.0.0.1:8000';
+  const startDateInput = document.getElementById('startdate');
+  const endDateInput = document.getElementById('enddate');
+  const dateModeInput = document.getElementById('dateMode');
+  const renderButton = document.getElementById('render-temp-btn');
+  const resetButton = document.getElementById('reset-temp-btn');
+
+  const currentDate = new Date();
+
+  DefaultEndDate = currentDate.toISOString().split('T')[0];
+
+  const startDate = new Date(currentDate);
+  startDate.setDate(startDate.getDate() - 28);
+  const DefaultStartDate = startDate.toISOString().split('T')[0];
+
+
+
+  renderButton.addEventListener('click', (event) => {
+    const startDate = startDateInput.value || DefaultStartDate; // Set default start date if empty
+    const endDate = endDateInput.value || DefaultEndDate; // Set default end date if empty
+    const dateMode = dateModeInput.value;
+
+
+
+    const url = `${BASE_URL}/medias/${dateMode}/${startDate}/${endDate}`;
+    console.log(url)
+    renderiza_tmp(url);
+    renderiza_hum(url);
+    renderiza_lux(url);
+    renderiza_volts(url);
+
+  });
+  resetButton.addEventListener('click', (event) => {
+
+    const url = `${BASE_URL}/medias`;
+    console.log(url);
+    renderiza_tmp(url);
+    renderiza_hum(url);
+    renderiza_lux(url);
+    renderiza_volts(url);
+
+     // Reset date inputs
+    startDateInput.value = "";
+    endDateInput.value = "";
+    dateModeInput.value = 2;
+
+  });
+</script>
+{% endblock %}

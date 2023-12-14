@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     # 'mqtt.apps.MqttConfig',
     'hours.apps.HoursConfig',
     'review.apps.ReviewConfig',
-    'serialMonitor.apps.SerialmonitorConfig'
+    'serialMonitor.apps.SerialmonitorConfig',
+    'minha_dashboard'
 ]
 
 MIDDLEWARE = [
@@ -61,7 +62,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            "/home/larm/Desktop/LarmDoor/site/templates", 
+            "templates", 
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -126,6 +127,8 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'templates/static'),)
+STATIC_ROOT = os.path.join('static')
 
 AUTH_USER_MODEL = 'userform.UserSystem'
 
