@@ -16,37 +16,35 @@ def getLastRfid():
     return temp
 
 def start_serial_handler():
-    # door_serial_thread = threading.Thread(target=door_serial_connection)
-    # door_serial_thread.start()
+    door_serial_thread = threading.Thread(target=door_serial_connection)
+    door_serial_thread.start()
     sensor_serial_thread = threading.Thread(target=sensor_serial_connection)
     sensor_serial_thread.start()
 
 def sensor_serial_connection():
-    # ser = connect_to_serial("/dev/ttyACM1", 9600)
-    ser = connect_to_serial("COM11", 9600)
+    ser = connect_to_serial("/dev/ttyACM0", 9600)
     people_count = 0
 
     while True:
-        # try:
-        if ser.in_waiting > 0:
-            data = ser.readline().decode('utf-8').strip().upper()
-            print(data)
+        try:
+            if ser.in_waiting > 0:
+                data = ser.readline().decode('utf-8').strip().upper()
+                print(data)
 
-            values = data.split(',')
-            if len(values) == 3:
-                people_count = PunchCard.objects.filter(punch_out_time__isnull=True).values('user').distinct().count()
-                print(f"Number of people in the room: {people_count}")
+                values = data.split(',')
+                if len(values) == 3:
+                    people_count = PunchCard.objects.filter(punch_out_time__isnull=True).values('user').distinct().count()
+                    print(f"Number of people in the room: {people_count}")
 
-                entrada = Entradas(temperatura=values[0], humidade=values[1], lux=values[2], alunos=people_count, voltagem=random.randint(0, 220))
-                entrada.save()
-                print("Data inserted into minhadashboard_entradas table.")
+                    entrada = Entradas(temperatura=values[0], humidade=values[1], lux=values[2], alunos=people_count, voltagem=random.randint(0, 220))
+                    entrada.save()
+                    print("Data inserted into minhadashboard_entradas table.")
+                    
+                else:
+                    print("Invalid data format.")
                 
-            else:
-                print("Invalid data format.")
-                
-        # except:
-        #     # ser = connect_to_serial("/dev/ttyACM1", 9600)
-        #     ser = connect_to_serial("COM11", 9600)
+        except:
+            ser = connect_to_serial("/dev/ttyACM0", 9600)
 
 def connect_to_serial(port, baudrate):
     start_time = time.time()
@@ -66,7 +64,7 @@ def connect_to_serial(port, baudrate):
 
 def door_serial_connection():
     ser1 = connect_to_serial("/dev/ttyUSB0", 9600)
-    ser2 = connect_to_serial("/dev/ttyACM0", 9600)
+    ser2 = connect_to_serial("/dev/ttyACM1", 9600)
 
     while True:     
         try:      
@@ -96,7 +94,7 @@ def door_serial_connection():
                     punch_out(response.pk)
                     time.sleep(0.5)
         except:
-            ser2 = connect_to_serial("/dev/ttyACM0", 9600)
+            ser2 = connect_to_serial("/dev/ttyACM1", 9600)
 
 def chek_db(code):
     try:
